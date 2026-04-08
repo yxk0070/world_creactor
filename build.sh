@@ -28,6 +28,8 @@ cp "$ROOT_DIR/input_analyzer.py" "$OUTPUT_DIR/input_analyzer.py"
 cp "$ROOT_DIR/cache_manager.py" "$OUTPUT_DIR/cache_manager.py"
 cp -r "$ROOT_DIR/archive" "$OUTPUT_DIR/archive"
 
+cp "$ROOT_DIR/requirements.txt" "$OUTPUT_DIR/requirements.txt"
+
 mkdir -p "$OUTPUT_DIR/frontend"
 cp -r "$ROOT_DIR/frontend/dist" "$OUTPUT_DIR/frontend/dist"
 
