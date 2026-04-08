@@ -1,0 +1,19 @@
+# Web framework
+flask
+
+# Env
+python-dotenv
+
+# LLM orchestration
+langchain
+langchain-core
+langchain-openai
+
+# Common transitive deps (explicit for safety)
+pydantic
+jsonschema
+tenacity
+PyYAML
+
+# HTTP (used in tests / some environments)
+requests
