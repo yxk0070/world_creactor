@@ -5,9 +5,10 @@ set -ex
 
 ROOT_DIR=$(pwd)
 OUTPUT_DIR="$ROOT_DIR/output"
+OUTPUT_RESOURCE_DIR="$ROOT_DIR/output_resource"
 
-rm -rf "$OUTPUT_DIR"
-mkdir -p "$OUTPUT_DIR"
+rm -rf "$OUTPUT_DIR" "$OUTPUT_RESOURCE_DIR"
+mkdir -p "$OUTPUT_DIR" "$OUTPUT_RESOURCE_DIR"
 
 echo "==== 开始构建前端 ===="
 cd "$ROOT_DIR/frontend"
@@ -29,6 +30,9 @@ cp -r "$ROOT_DIR/archive" "$OUTPUT_DIR/archive"
 
 mkdir -p "$OUTPUT_DIR/frontend"
 cp -r "$ROOT_DIR/frontend/dist" "$OUTPUT_DIR/frontend/dist"
+
+# 资源产物目录：供 SCM 资源包打包（静态文件）
+cp -r "$ROOT_DIR/frontend/dist/." "$OUTPUT_RESOURCE_DIR/"
 
 cp "$ROOT_DIR/bootstrap.sh" "$OUTPUT_DIR/bootstrap.sh"
 chmod +x "$OUTPUT_DIR/bootstrap.sh"
