@@ -23,6 +23,10 @@ if [ -f "./requirements.txt" ] && [ ! -f "$RUNTIME_MARKER" ]; then
   touch "$RUNTIME_MARKER"
 fi
 
+# 缓存目录（运行时目录只读，需要使用可写路径）
+export CACHE_DIR=${CACHE_DIR:-/tmp/world_creator_cache}
+mkdir -p "$CACHE_DIR"
+
 # 从环境变量获取端口，默认 8080
 export PORT=${PORT:-8080}
 

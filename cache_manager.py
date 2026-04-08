@@ -8,16 +8,15 @@ from typing import Dict, List, Optional
 class CacheManager:
     """缓存管理器 - 负责管理生成结果的缓存"""
     
-    def __init__(self, cache_dir: str = "./cache"):
-        self.cache_dir = cache_dir
-        self.cache_file = os.path.join(cache_dir, "cache.json")
+    def __init__(self, cache_dir: Optional[str] = None):
+        self.cache_dir = cache_dir or os.environ.get("CACHE_DIR", "/tmp/world_creator_cache")
+        self.cache_file = os.path.join(self.cache_dir, "cache.json")
         self.cache = self._load_cache()
         self._ensure_cache_dir_exists()
     
     def _ensure_cache_dir_exists(self):
         """确保缓存目录存在"""
-        if not os.path.exists(self.cache_dir):
-            os.makedirs(self.cache_dir)
+        os.makedirs(self.cache_dir, exist_ok=True)
     
     def _load_cache(self) -> Dict:
         """从文件加载缓存"""
