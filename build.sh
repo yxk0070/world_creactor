@@ -31,6 +31,9 @@ cp -r "$ROOT_DIR/archive" "$OUTPUT_DIR/archive"
 mkdir -p "$OUTPUT_DIR/frontend"
 cp -r "$ROOT_DIR/frontend/dist" "$OUTPUT_DIR/frontend/dist"
 
+# 同时把 dist 内容放到 output 根目录，满足 deploy.yml 中的 /index.html /assets 路径
+cp -r "$ROOT_DIR/frontend/dist/." "$OUTPUT_DIR/"
+
 # 资源产物目录：供 SCM 资源包打包（静态文件）
 cp -r "$ROOT_DIR/frontend/dist/." "$OUTPUT_RESOURCE_DIR/"
 
