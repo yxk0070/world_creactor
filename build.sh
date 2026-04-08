@@ -37,4 +37,7 @@ cp -r "$ROOT_DIR/frontend/dist/." "$OUTPUT_RESOURCE_DIR/"
 cp "$ROOT_DIR/bootstrap.sh" "$OUTPUT_DIR/bootstrap.sh"
 chmod +x "$OUTPUT_DIR/bootstrap.sh"
 
+cp "$ROOT_DIR/deploy.yml" "$OUTPUT_DIR/deploy.yml"
+cp "$ROOT_DIR/deploy.yml" "$OUTPUT_RESOURCE_DIR/deploy.yml"
+
 echo "==== 产物目录已生成：$OUTPUT_DIR ===="

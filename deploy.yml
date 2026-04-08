@@ -1,0 +1,19 @@
+version: 1
+
+web:
+  runtime: worker
+
+server:
+  cwd: './'
+  script: './bootstrap.sh'
+  runtime: node20
+
+routes:
+  - src: /api/**
+    dest:
+      type: server
+
+  - src: /**
+    dest:
+      type: web
+      path: /index.html
