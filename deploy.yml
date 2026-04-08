@@ -6,6 +6,7 @@ web:
 server:
   cwd: './'
   script: './bootstrap.sh'
+  runtime: nodejs20
 
 routes:
   - src: /api/**
