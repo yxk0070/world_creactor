@@ -39,22 +39,57 @@ export function StorylineRenderer({ data }: StorylineRendererProps) {
     });
 
     try {
-      const prompt = `请对故事中的事件进行展开，生成5-8个细节子节点。故事上下文：${localData.story_summary || localData.core_theme || "无"}。事件标题：${eventTitle}\n事件描述：${event.description}\n\n请必须使用 expand_story_event 工具并返回其 JSON 格式结果。`;
+      const prompt = `请对故事中的事件进行展开，生成3-5个细节子节点。故事上下文：${localData.story_summary || localData.core_theme || "无"}。事件标题：${eventTitle}\n事件描述：${event.description}\n\n请使用 expand_story_event 工具`;
 
-      const response = await fetch("/api/chat", {
+      const response = await fetch("/api/chat/workflow", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: prompt, auto_save: false }),
       });
 
-      const resData = await response.json();
-      if (resData.success) {
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+      let finalData = null;
+
+      if (reader) {
+        let buffer = "";
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split("\n\n");
+
+          // 保留最后一段不完整的，等待下一次拼接
+          buffer = lines.pop() || "";
+
+          for (const line of lines) {
+            if (line.startsWith("data: ")) {
+              try {
+                const data = JSON.parse(line.slice(6));
+                if (data.type === "end") {
+                  finalData = data.content;
+                } else if (data.type === "error") {
+                  throw new Error(data.message);
+                }
+              } catch (e) {
+                // ignore partial JSON errors
+              }
+            }
+          }
+        }
+      }
+
+      if (finalData && finalData.success) {
         let parsed = null;
         try {
-          parsed = JSON.parse(resData.response);
+          parsed = JSON.parse(finalData.response);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            parsed = parsed[0];
+          }
           if (parsed.data) parsed = parsed.data;
         } catch (e) {
-          console.error("Failed to parse detail response", resData.response);
+          console.error("Failed to parse detail response", finalData.response);
         }
 
         if (parsed && parsed.sub_events) {
@@ -108,7 +143,7 @@ export function StorylineRenderer({ data }: StorylineRendererProps) {
       } else {
         updateTask(taskId, {
           status: "error",
-          message: resData.error || "请求失败",
+          message: finalData?.error || "请求失败",
         });
       }
     } catch (error) {

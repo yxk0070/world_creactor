@@ -423,50 +423,59 @@ export function CachePage() {
                     );
                     console.log("CachePage -> 剥离一层的 data:", data);
 
+                    // 提供一个通用的安全递归解包函数，用来做类型推断
+                    let testData = data;
+                    while (true) {
+                      if (Array.isArray(testData) && testData.length > 0) {
+                        testData = testData[0];
+                      } else if (testData && testData.data) {
+                        testData = testData.data;
+                      } else {
+                        break;
+                      }
+                    }
+
                     if (
-                      data &&
-                      (data.key_events || data.title) &&
-                      !data.characters &&
-                      !data.content // 确保不是文章
+                      testData &&
+                      (testData.key_events || testData.title) &&
+                      !testData.characters &&
+                      !testData.content // 确保不是文章
                     ) {
                       console.log("CachePage -> 判定为: 故事线");
                       return <StorylineRenderer data={data} />;
-                    } else if (data && data.world_name && !data.characters) {
+                    } else if (
+                      testData &&
+                      testData.world_name &&
+                      !testData.characters
+                    ) {
                       console.log("CachePage -> 判定为: 世界观");
                       return <WorldviewRenderer data={selectedItem.data} />;
                     } else if (
-                      data &&
-                      data.name &&
-                      !data.characters &&
-                      !data.content
+                      testData &&
+                      testData.name &&
+                      !testData.characters &&
+                      !testData.content
                     ) {
                       console.log("CachePage -> 判定为: 单个人物或关联人物");
                       return <CharacterRenderer data={selectedItem.data} />;
                     } else if (
-                      data &&
-                      ((data.characters && Array.isArray(data.characters)) ||
-                        (data.data?.characters &&
-                          Array.isArray(data.data?.characters)))
+                      testData &&
+                      testData.characters &&
+                      Array.isArray(testData.characters)
                     ) {
                       // 人物关系网 (generate_character_network)
                       console.log("CachePage -> 判定为: 人物关系网");
                       return <CharacterNetworkRenderer data={data} />;
-                    } else if (data && (data.dialogue || data.data?.dialogue)) {
+                    } else if (testData && testData.dialogue) {
                       console.log("CachePage -> 判定为: 对话文案");
                       return <DialogueRenderer data={data} />;
-                    } else if (data && (data.script || data.data?.script)) {
+                    } else if (testData && testData.script) {
                       console.log("CachePage -> 判定为: 短句脚本");
                       return <ShortScriptRenderer data={data} />;
                     } else if (
-                      data &&
-                      (data.content ||
-                        data.data?.content ||
-                        data.data?.data?.content) &&
-                      (data.title ||
-                        data.data?.title ||
-                        data.data?.data?.title ||
-                        data.event_description ||
-                        data.data?.event_description)
+                      testData &&
+                      testData.content &&
+                      (testData.title || testData.event_description)
                     ) {
                       // 事件文章 (generate_article_from_event)
                       console.log("CachePage -> 判定为: 事件文章");

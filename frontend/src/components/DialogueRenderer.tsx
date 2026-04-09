@@ -1,10 +1,56 @@
+import React from "react";
+
 interface DialogueRendererProps {
   data: any;
 }
 
 export function DialogueRenderer({ data }: DialogueRendererProps) {
-  const dialogueData = data.data || data;
-  const content = dialogueData.content || dialogueData.dialogue || JSON.stringify(dialogueData, null, 2);
+  let dialogueData = data;
+  if (data?.data && (data.data.dialogue || data.data.content)) {
+    dialogueData = data.data;
+  }
+  
+  const content = dialogueData.content || dialogueData.dialogue || (typeof dialogueData === "string" ? dialogueData : JSON.stringify(dialogueData, null, 2));
+
+  // 简单的文案解析器
+  const parseDialogue = (text: string) => {
+    return text.split("\n").map((line, index) => {
+      line = line.trim();
+      if (!line) return null;
+
+      // 场景或括号说明：【场景...】或 [场景...]
+      if (line.match(/^【.*】$/) || line.match(/^\[.*\]$/)) {
+        return { id: index, type: "scene", text: line };
+      }
+
+      // 角色对话：角色名（动作）：对话内容
+      const match = line.match(/^([^(（:：]+)(?:[(（](.*?)[)）])?[：:]([\s\S]*)$/);
+      if (match) {
+        return {
+          id: index,
+          type: "dialogue",
+          character: match[1].trim(),
+          action: match[2] ? match[2].trim() : null,
+          dialogue: match[3].trim(),
+        };
+      }
+
+      // 其他动作或旁白
+      return { id: index, type: "action", text: line };
+    }).filter(Boolean);
+  };
+
+  const parsedLines = typeof content === "string" ? parseDialogue(content) : [];
+
+  // 获取一些颜色映射给角色名
+  const getColorForCharacter = (name: string) => {
+    const colors = ["#60a5fa", "#34d399", "#f472b6", "#fbbf24", "#c084fc", "#38bdf8", "#fb923c"];
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+      hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return colors[Math.abs(hash) % colors.length];
+  };
 
   return (
     <div
@@ -17,28 +63,87 @@ export function DialogueRenderer({ data }: DialogueRendererProps) {
     >
       <h3
         style={{
-          margin: "0 0 16px 0",
+          margin: "0 0 20px 0",
           color: "#f8fafc",
           display: "flex",
           alignItems: "center",
-          gap: "8px",
+          gap: "10px",
+          fontSize: "18px"
         }}
       >
-        <span>💬</span> 对话文案
+        <span style={{ fontSize: "24px" }}>💬</span> 对话文案
       </h3>
+      
       <div
         style={{
-          color: "#e2e8f0",
-          lineHeight: "1.8",
-          fontSize: "15px",
-          whiteSpace: "pre-wrap",
+          display: "flex",
+          flexDirection: "column",
+          gap: "16px",
           background: "rgba(30, 41, 59, 0.4)",
-          padding: "20px",
+          padding: "24px",
           borderRadius: "12px",
           border: "1px solid rgba(51, 65, 85, 0.5)",
         }}
       >
-        {typeof content === "string" ? content : JSON.stringify(content, null, 2)}
+        {parsedLines.length > 0 ? (
+          parsedLines.map((line: any) => {
+            if (line.type === "scene") {
+              return (
+                <div key={line.id} style={{ 
+                  textAlign: "center", 
+                  margin: "12px 0",
+                  color: "#94a3b8",
+                  fontSize: "14px",
+                  fontWeight: 600,
+                  background: "rgba(0,0,0,0.2)",
+                  padding: "8px 16px",
+                  borderRadius: "8px",
+                  display: "inline-block",
+                  alignSelf: "center"
+                }}>
+                  {line.text}
+                </div>
+              );
+            }
+            if (line.type === "dialogue") {
+              const charColor = getColorForCharacter(line.character);
+              return (
+                <div key={line.id} style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                  <div style={{ display: "flex", alignItems: "baseline", gap: "8px" }}>
+                    <span style={{ fontWeight: "bold", fontSize: "16px", color: charColor }}>
+                      {line.character}
+                    </span>
+                    {line.action && (
+                      <span style={{ color: "#64748b", fontSize: "14px", fontStyle: "italic" }}>
+                        ({line.action})
+                      </span>
+                    )}
+                  </div>
+                  <div style={{ 
+                    color: "#e2e8f0", 
+                    fontSize: "15px", 
+                    lineHeight: "1.6",
+                    background: "rgba(255,255,255,0.03)",
+                    padding: "12px 16px",
+                    borderRadius: "0 12px 12px 12px",
+                    borderLeft: `3px solid ${charColor}`
+                  }}>
+                    {line.dialogue}
+                  </div>
+                </div>
+              );
+            }
+            return (
+              <div key={line.id} style={{ color: "#cbd5e1", fontSize: "15px", lineHeight: "1.6", fontStyle: "italic", paddingLeft: "16px" }}>
+                {line.text}
+              </div>
+            );
+          })
+        ) : (
+          <div style={{ color: "#e2e8f0", whiteSpace: "pre-wrap", lineHeight: "1.8" }}>
+            {typeof content === "string" ? content : JSON.stringify(content, null, 2)}
+          </div>
+        )}
       </div>
     </div>
   );

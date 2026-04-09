@@ -137,10 +137,10 @@ export function CoreStorylinePage() {
                   style={styles.select}
                 >
                   <option value="迷你">迷你（约5个事件）</option>
-                  <option value="短篇">短篇（约10-15个事件）</option>
-                  <option value="中篇">中篇（约15-25个事件）</option>
-                  <option value="长篇">长篇（约30+个事件）</option>
-                  <option value="史诗">史诗（宏大架构）</option>
+                  <option value="短篇">短篇（约8-12个事件）</option>
+                  <option value="中篇">中篇（约12-18个事件）</option>
+                  <option value="长篇">长篇（约18-25个事件）</option>
+                  <option value="史诗">史诗（约25-30个事件）</option>
                 </select>
               </label>
 
@@ -160,7 +160,7 @@ export function CoreStorylinePage() {
                     style={{ marginRight: "8px" }}
                   />
                   <span style={{ fontSize: "14px", color: "#cbd5e1" }}>
-                    同时为每个事件生成5-8个细节子节点（耗时较长）
+                    同时为每个事件生成3-5个细节子节点（注意：长篇慎用，容易导致截断）
                   </span>
                 </div>
               </label>

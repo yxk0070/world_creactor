@@ -567,6 +567,7 @@ def get_agent_executor(scenario: str = "小说"):
     llm = ChatOpenAI(
         model=model,
         temperature=0.7,
+        max_tokens=8192,
         openai_api_key=api_key,
         openai_api_base=base_url
     )
@@ -790,14 +791,15 @@ def get_agent_executor(scenario: str = "小说"):
 
 【故事生成要求】
 - 如果提供了世界观，故事必须严格在该世界观的设定和背景下展开，不得出现穿越到其他世界（如回到古代、去往未来等不符合该世界观设定的情况），所有地点、设定、人物行为都必须符合该世界观。
-- 如果 generate_details 为 true，则必须为每个关键事件生成5-8个具体的子事件(sub_events)节点，详细描述该事件中的具体行为或情节。
+- 如果 generate_details 为 true，则为每个关键事件生成3-5个具体的子事件(sub_events)节点，详细描述该事件中的具体行为或情节。注意：如果故事规模是中篇或以上，开启细节生成会导致极大的输出量，务必极度精简事件和子事件的描述，以保证最终的 JSON 结构完整闭合！
 - 如果 generate_details 为 false，则 sub_events 数组留空即可。
-- 根据故事规模确定关键事件数量：
-  - 迷你：5个关键事件
-  - 简短：10-15个关键事件
-  - 中等：15-25个关键事件
-  - 长篇：至少30个关键事件
-- 每个事件只写梗概，保持在200字以内
+- 根据故事规模确定关键事件数量（为防止 JSON 输出截断，请严格遵守以下数量限制，并在生成大量事件时保持精炼）：
+  - 迷你：约5个关键事件
+  - 短篇：约8-12个关键事件
+  - 中篇：约12-18个关键事件
+  - 长篇：约18-25个关键事件
+  - 史诗：约25-30个关键事件
+- 每个事件只写梗概，保持在150字以内
 - 关键事件需要按时间顺序排列，形成完整的故事弧光
 - 事件之间要有逻辑联系和因果关系
 - 每个事件都要推动故事发展，展现人物成长
@@ -1017,7 +1019,7 @@ def chat_workflow():
                                 q.put(("step", {
                                     "step": 1,
                                     "tool": tool_name,
-                                    "description": f"执行特定生成任务 ({tool_name})",
+                                    "description": user_input,
                                     "parameters": {}
                                 }))
                                 q.put(("done", None))

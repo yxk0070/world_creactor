@@ -58,40 +58,48 @@ function ToolCardRenderer({ item }: { item: any }) {
   // 2. 如果没有 tool 字段，根据 JSON 结构特征智能推断渲染器
   const targetData = item.data || item;
 
+  // 提供一个通用的安全递归解包函数，用来做类型推断
+  let testData = targetData;
+  while (true) {
+    if (Array.isArray(testData) && testData.length > 0) {
+      testData = testData[0];
+    } else if (testData && testData.data) {
+      testData = testData.data;
+    } else {
+      break;
+    }
+  }
+
   if (
-    targetData &&
-    (targetData.key_events || targetData.title) &&
-    !targetData.characters &&
-    !targetData.content
+    testData &&
+    (testData.key_events || testData.title) &&
+    !testData.characters &&
+    !testData.content
   ) {
     return (
       <StorylineRenderer
         data={{ data: targetData, id: item.id || item.cache_id }}
       />
     );
-  } else if (targetData && targetData.world_name && !targetData.characters) {
+  } else if (testData && testData.world_name && !testData.characters) {
     return <WorldviewRenderer data={{ data: targetData }} />;
   } else if (
-    targetData &&
-    targetData.name &&
-    !targetData.characters &&
-    !targetData.content
+    testData &&
+    testData.name &&
+    !testData.characters &&
+    !testData.content
   ) {
     return <CharacterRenderer data={{ data: targetData }} />;
-  } else if (
-    targetData &&
-    (targetData.characters || targetData.data?.characters) &&
-    (targetData.network_summary || targetData.data?.network_summary)
-  ) {
+  } else if (testData && testData.characters && testData.network_summary) {
     return <CharacterNetworkRenderer data={targetData} />;
-  } else if (targetData && (targetData.dialogue || targetData.data?.dialogue)) {
+  } else if (testData && testData.dialogue) {
     return <DialogueRenderer data={{ data: targetData }} />;
-  } else if (targetData && (targetData.script || targetData.data?.script)) {
+  } else if (testData && testData.script) {
     return <ShortScriptRenderer data={{ data: targetData }} />;
   } else if (
-    targetData &&
-    (targetData.content || targetData.data?.content) &&
-    (targetData.title || targetData.data?.title)
+    testData &&
+    testData.content &&
+    (testData.title || testData.event_description)
   ) {
     return <ArticleRenderer data={{ data: targetData }} />;
   }
