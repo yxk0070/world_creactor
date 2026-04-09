@@ -45,7 +45,17 @@ export function useCache() {
       const response = await fetch("/api/cache/all");
       const data = await response.json();
       if (data.success) {
-        setCacheData(data.data);
+        // 确保数据按 created_at 降序排列
+        const sortedData: CacheData = {};
+        for (const [key, items] of Object.entries(data.data as CacheData)) {
+          sortedData[key] = [...items].sort((a, b) => {
+            return (
+              new Date(b.created_at).getTime() -
+              new Date(a.created_at).getTime()
+            );
+          });
+        }
+        setCacheData(sortedData);
         setStats(data.stats);
       }
     } catch (error) {
@@ -74,7 +84,7 @@ export function useCache() {
         data.data.forEach((item: CacheItem) => {
           const category =
             Object.keys(categoryNames).find((cat) =>
-              cacheData[cat]?.some((c) => c.id === item.id)
+              cacheData[cat]?.some((c) => c.id === item.id),
             ) || "search";
           if (!searchResults[category]) {
             searchResults[category] = [];
@@ -114,7 +124,7 @@ export function useCache() {
       !window.confirm(
         `确定要清空 ${
           categoryNames[category as keyof typeof categoryNames] || category
-        } 分类的所有历史记录吗？`
+        } 分类的所有历史记录吗？`,
       )
     )
       return;

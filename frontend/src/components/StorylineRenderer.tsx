@@ -215,7 +215,7 @@ export function StorylineRenderer({ data }: StorylineRendererProps) {
                               >
                                 👤 {char}
                               </span>
-                            )
+                            ),
                           )}
                       </div>
 

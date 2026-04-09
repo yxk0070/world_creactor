@@ -159,13 +159,19 @@ export function useCharacters() {
       } else {
         const errorMsg = data.error || "未知错误";
         setStreamContent("生成失败：" + errorMsg);
-        updateTask(taskId, { status: "error", message: "生成失败：" + errorMsg });
+        updateTask(taskId, {
+          status: "error",
+          message: "生成失败：" + errorMsg,
+        });
       }
     } catch (error) {
       console.error("Error:", error);
       const errorMessage = error instanceof Error ? error.message : "未知错误";
       setStreamContent("生成失败：" + errorMessage);
-      updateTask(taskId, { status: "error", message: "生成出错：" + errorMessage });
+      updateTask(taskId, {
+        status: "error",
+        message: "生成出错：" + errorMessage,
+      });
     } finally {
       setIsLoading(false);
     }

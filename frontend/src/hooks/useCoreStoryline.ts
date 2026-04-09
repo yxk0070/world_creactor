@@ -33,7 +33,7 @@ export function useCoreStoryline() {
   const [worldviewName, setWorldviewName] = useState("");
   const [worldviews, setWorldviews] = useState<Worldview[]>([]);
   const [selectedCharacterIds, setSelectedCharacterIds] = useState<string[]>(
-    []
+    [],
   );
   const [allCharacters, setAllCharacters] = useState<Character[]>([]);
   const [storyScale, setStoryScale] = useState("中等");
@@ -49,7 +49,7 @@ export function useCoreStoryline() {
   const filteredCharacters = selectedWorldview
     ? allCharacters.filter((char) => {
         const selectedWorldviewObj = worldviews.find(
-          (w) => w.id === selectedWorldview
+          (w) => w.id === selectedWorldview,
         );
         if (!selectedWorldviewObj) return false;
         const worldName =
@@ -92,7 +92,7 @@ export function useCoreStoryline() {
     if (selectedWorldview) {
       setSelectedCharacterIds((prev) => {
         const selectedWorldviewObj = worldviews.find(
-          (w) => w.id === selectedWorldview
+          (w) => w.id === selectedWorldview,
         );
         if (!selectedWorldviewObj) return [];
         const worldName =

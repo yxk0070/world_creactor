@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { styles } from "./EditableResult.styles";
 
 interface EditableResultProps {
   data: any;
@@ -179,88 +180,3 @@ export function EditableResult({
     </div>
   );
 }
-
-const styles = {
-  container: {
-    position: "relative" as const,
-    border: "1px solid rgba(99, 102, 241, 0.2)",
-    borderRadius: "8px",
-    background: "rgba(15, 23, 42, 0.4)",
-    marginTop: "16px",
-    display: "flex",
-    flexDirection: "column" as const,
-  },
-  toolbar: {
-    display: "flex",
-    justifyContent: "flex-end",
-    gap: "8px",
-    padding: "8px 16px",
-    borderBottom: "1px solid rgba(99, 102, 241, 0.2)",
-    background: "rgba(30, 41, 59, 0.5)",
-    borderTopLeftRadius: "8px",
-    borderTopRightRadius: "8px",
-  },
-  content: {
-    padding: "16px",
-    flex: 1,
-  },
-  editBtn: {
-    padding: "6px 12px",
-    background: "rgba(59, 130, 246, 0.2)",
-    color: "#93c5fd",
-    border: "1px solid rgba(59, 130, 246, 0.3)",
-    borderRadius: "4px",
-    cursor: "pointer",
-    fontSize: "13px",
-  },
-  saveBtn: {
-    padding: "6px 12px",
-    background: "rgba(34, 197, 94, 0.2)",
-    color: "#86efac",
-    border: "1px solid rgba(34, 197, 94, 0.3)",
-    borderRadius: "4px",
-    cursor: "pointer",
-    fontSize: "13px",
-  },
-  cancelBtn: {
-    padding: "6px 12px",
-    background: "rgba(100, 116, 139, 0.2)",
-    color: "#cbd5e1",
-    border: "1px solid rgba(100, 116, 139, 0.3)",
-    borderRadius: "4px",
-    cursor: "pointer",
-    fontSize: "13px",
-  },
-  exportBtn: {
-    padding: "6px 12px",
-    background: "rgba(168, 85, 247, 0.2)",
-    color: "#d8b4fe",
-    border: "1px solid rgba(168, 85, 247, 0.3)",
-    borderRadius: "4px",
-    cursor: "pointer",
-    fontSize: "13px",
-  },
-  textarea: {
-    width: "100%",
-    minHeight: "400px",
-    background: "rgba(15, 23, 42, 0.8)",
-    color: "#cbd5e1",
-    border: "1px solid rgba(99, 102, 241, 0.3)",
-    borderRadius: "4px",
-    padding: "12px",
-    fontFamily: "monospace",
-    fontSize: "14px",
-    lineHeight: "1.5",
-    resize: "vertical" as const,
-    boxSizing: "border-box" as const,
-    whiteSpace: "pre-wrap" as const,
-    wordBreak: "break-word" as const,
-  },
-  error: {
-    padding: "8px 16px",
-    background: "rgba(239, 68, 68, 0.1)",
-    color: "#fca5a5",
-    borderBottom: "1px solid rgba(239, 68, 68, 0.2)",
-    fontSize: "13px",
-  },
-};

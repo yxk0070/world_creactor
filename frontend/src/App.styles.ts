@@ -1,0 +1,117 @@
+export const styles = {
+  container: {
+    minHeight: "100vh",
+    background:
+      "linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%)",
+  },
+  nav: {
+    background: "rgba(30, 41, 59, 0.95)",
+    backdropFilter: "blur(12px)",
+    borderBottom: "1px solid rgba(71, 85, 105, 0.5)",
+    padding: "0 32px",
+    position: "sticky" as const,
+    top: 0,
+    zIndex: 99999,
+  },
+  navContent: {
+    maxWidth: "1400px",
+    margin: "0 auto",
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    padding: "16px 0",
+    flexWrap: "wrap" as const,
+  },
+  logo: {
+    fontSize: "24px",
+    marginRight: "24px",
+    fontWeight: "700",
+    color: "#f8fafc",
+    cursor: "pointer",
+    transition: "transform 0.2s ease",
+  },
+  mainPage: {
+    maxWidth: "1000px",
+    margin: "0 auto",
+    padding: "32px",
+  },
+  chatSection: {
+    background: "rgba(30, 41, 59, 0.85)",
+    border: "1px solid rgba(71, 85, 105, 0.5)",
+    borderRadius: "20px",
+    padding: "32px",
+    marginBottom: "24px",
+  },
+  chatTitle: {
+    fontSize: "28px",
+    fontWeight: "700",
+    marginBottom: "8px",
+    color: "#f8fafc",
+    margin: 0,
+  },
+  chatSubtitle: {
+    color: "#94a3b8",
+    marginBottom: "24px",
+  },
+  inputForm: {
+    display: "flex",
+    gap: "12px",
+  },
+  input: {
+    flex: 1,
+    padding: "14px 20px",
+    border: "2px solid rgba(71, 85, 105, 0.5)",
+    borderRadius: "12px",
+    background: "rgba(15, 23, 42, 0.8)",
+    color: "#f8fafc",
+    fontSize: "15px",
+    boxSizing: "border-box" as const,
+  },
+  submitButton: {
+    padding: "14px 28px",
+    background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
+    color: "white",
+    border: "none",
+    borderRadius: "12px",
+    cursor: "pointer",
+    fontWeight: "600",
+    fontSize: "15px",
+  },
+  historySection: {
+    display: "flex",
+    flexDirection: "column" as const,
+    gap: "16px",
+  },
+  message: {
+    border: "1px solid rgba(71, 85, 105, 0.5)",
+    borderRadius: "16px",
+    padding: "20px 24px",
+  },
+  messageRole: {
+    fontWeight: "600",
+    marginBottom: "12px",
+  },
+  messageContent: {
+    color: "#e2e8f0",
+    whiteSpace: "pre-wrap" as const,
+  },
+  dataSection: {
+    marginTop: "16px",
+  },
+  summary: {
+    color: "#94a3b8",
+    cursor: "pointer",
+  },
+  dataContent: {
+    marginTop: "12px",
+  },
+  rawData: {
+    padding: "16px",
+    background: "rgba(15, 23, 42, 0.6)",
+    borderRadius: "8px",
+    fontSize: "13px",
+    color: "#94a3b8",
+    overflow: "auto" as const,
+    margin: 0,
+  },
+};

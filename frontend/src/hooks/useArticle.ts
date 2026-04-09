@@ -17,7 +17,7 @@ export function useArticle() {
   const [savedStories, setSavedStories] = useState<any[]>([]);
   const [selectedStoryId, setSelectedStoryId] = useState<string>("");
   const [selectedEventIndex, setSelectedEventIndex] = useState<number | null>(
-    null
+    null,
   );
 
   useEffect(() => {

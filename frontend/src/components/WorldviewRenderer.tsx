@@ -85,7 +85,7 @@ export function WorldviewRenderer({ data }: WorldviewRendererProps) {
         <div
           style={{
             background: `linear-gradient(135deg, ${getGenreColor(
-              basic_settings?.genre
+              basic_settings?.genre,
             )}33 0%, rgba(139, 92, 246, 0.1) 100%)`,
             borderRadius: "12px",
             padding: "20px",
@@ -450,7 +450,7 @@ export function WorldviewRenderer({ data }: WorldviewRendererProps) {
                                 >
                                   {strength}
                                 </li>
-                              )
+                              ),
                             )}
                           </ul>
                         </div>
@@ -484,7 +484,7 @@ export function WorldviewRenderer({ data }: WorldviewRendererProps) {
                                 >
                                   {weakness}
                                 </li>
-                              )
+                              ),
                             )}
                           </ul>
                         </div>

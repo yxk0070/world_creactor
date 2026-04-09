@@ -43,7 +43,7 @@ export function useCharacterNetwork() {
 
         // 否则通过匹配世界观名称来筛选
         const selectedWorldview = worldviews.find(
-          (w) => w.id === selectedWorldviewId
+          (w) => w.id === selectedWorldviewId,
         );
         if (!selectedWorldview) return false;
 
@@ -92,7 +92,7 @@ export function useCharacterNetwork() {
     if (selectedWorldviewId) {
       setSelectedCharacters((prev) => {
         const selectedWorldview = worldviews.find(
-          (w) => w.id === selectedWorldviewId
+          (w) => w.id === selectedWorldviewId,
         );
         if (!selectedWorldview) return [];
         const worldName =

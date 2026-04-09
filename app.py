@@ -9,7 +9,7 @@ warnings.filterwarnings("ignore", category=UserWarning)
 from dotenv import load_dotenv
 from flask import Flask, render_template, request, jsonify, send_file
 from langchain_openai import ChatOpenAI
-from langchain.agents import AgentExecutor, create_openai_tools_agent
+from langchain.agents import AgentExecutor, create_openai_tools_agent, create_openai_functions_agent
 from langchain.tools import tool
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
@@ -389,6 +389,17 @@ def generate_character_network(worldview: str = "", core_characters: list = None
         }
     }, ensure_ascii=False)
 
+from pydantic import BaseModel, Field
+
+class TaskStep(BaseModel):
+    step: int = Field(description="步骤序号")
+    tool: str = Field(description="使用的工具名称")
+    description: str = Field(description="步骤描述")
+    parameters: dict = Field(description="传递给工具的参数")
+
+class TaskPlan(BaseModel):
+    plan: list[TaskStep] = Field(description="按顺序排列的执行步骤列表")
+
 def get_research_agent_executor():
     """
     获取研究员 Agent 执行器，用于将复杂的用户输入拆解成具体的任务步骤
@@ -425,24 +436,24 @@ def get_research_agent_executor():
 
 JSON 格式示例：
 [
-  {
+  {{
     "step": 1,
     "tool": "generate_worldview",
     "description": "生成末日世界观",
-    "parameters": {
+    "parameters": {{
       "genre": "末世",
       "theme": "寻找物资"
-    }
-  },
-  {
+    }}
+  }},
+  {{
     "step": 2,
     "tool": "generate_character",
     "description": "生成主角张三",
-    "parameters": {
+    "parameters": {{
       "name": "张三",
       "role": "主角"
-    }
-  }
+    }}
+  }}
 ]
 """
     prompt = ChatPromptTemplate.from_messages([
@@ -450,9 +461,9 @@ JSON 格式示例：
         ("user", "{input}")
     ])
     
-    agent = create_openai_functions_agent(llm, [], prompt)
-    # 因为我们不实际调用工具，只是让 LLM 输出 JSON 规划，所以我们直接用 LCEL chain
-    chain = prompt | llm
+    # 使用 with_structured_output 强制要求大模型返回我们定义的 JSON 结构
+    structured_llm = llm.with_structured_output(TaskPlan)
+    chain = prompt | structured_llm
     return chain
 
 def get_agent_executor():
@@ -580,7 +591,7 @@ def get_agent_executor():
   "tool": "generate_worldview",
   "status": "completed",
   "data": {{
-    "world_name": "世界名称",
+    "world_name": "（根据主题自由发挥创造一个有创意的专属世界名称，切勿直接使用样例名称）",
     "basic_settings": {{
       "genre": "世界类型",
       "magic_level": "魔法水平",
@@ -818,6 +829,154 @@ def analyze():
             'success': False,
             'error': str(e)
         }), 500
+
+
+@app.route('/api/chat/workflow', methods=['POST'])
+def chat_workflow():
+    print("[DEBUG] 收到 /api/chat/workflow 请求")
+    try:
+        data = request.json
+        user_input = data.get('message', '')
+        auto_save = data.get('auto_save', True)
+        worldview_id = data.get('worldview_id', None)
+        
+        if not user_input:
+            return jsonify({'error': '请输入消息'}), 400
+            
+        def generate():
+            is_analysis_request = user_input.startswith("请从以下文章中分析") or user_input.startswith("请从以下文章中提取")
+            
+            if not is_analysis_request:
+                try:
+                    yield f"data: {json.dumps({'type': 'status', 'message': '正在分析任务意图...'}, ensure_ascii=False)}\n\n"
+                    
+                    research_chain = get_research_agent_executor()
+                    research_result = research_chain.invoke({"input": user_input})
+                    
+                    # 兼容 structured_output 已经是对象的情况
+                    if hasattr(research_result, 'plan'):
+                        plan = [step.dict() for step in research_result.plan]
+                    else:
+                        research_output = research_result.content if hasattr(research_result, 'content') else str(research_result)
+                        cleaned_research_output = research_output.strip()
+                        if cleaned_research_output.startswith("```json"): cleaned_research_output = cleaned_research_output[7:]
+                        elif cleaned_research_output.startswith("```"): cleaned_research_output = cleaned_research_output[3:]
+                        if cleaned_research_output.endswith("```"): cleaned_research_output = cleaned_research_output[:-3]
+                        cleaned_research_output = cleaned_research_output.strip()
+                        plan = json.loads(cleaned_research_output)
+                    
+                    if isinstance(plan, list) and len(plan) > 0:
+                        yield f"data: {json.dumps({'type': 'plan', 'plan': plan}, ensure_ascii=False)}\n\n"
+                        
+                        agent_executor = get_agent_executor()
+                        results = []
+                        cache_ids = []
+                        
+                        for i, step in enumerate(plan):
+                            tool_name = step.get('tool')
+                            description = step.get('description', '')
+                            params = step.get('parameters', {})
+                            
+                            yield f"data: {json.dumps({'type': 'step_start', 'step': i, 'message': f'执行中: {description}'}, ensure_ascii=False)}\n\n"
+                            
+                            step_input = f"请使用 {tool_name} 工具，完成以下任务：{description}。\n"
+                            if params:
+                                step_input += f"请使用以下参数：\n{json.dumps(params, ensure_ascii=False)}"
+                                
+                            try:
+                                step_result = agent_executor.invoke({"input": step_input})
+                                step_output = step_result['output']
+                                
+                                cleaned_out = step_output.strip()
+                                if cleaned_out.startswith("```json"): cleaned_out = cleaned_out[7:]
+                                elif cleaned_out.startswith("```"): cleaned_out = cleaned_out[3:]
+                                if cleaned_out.endswith("```"): cleaned_out = cleaned_out[:-3]
+                                cleaned_out = cleaned_out.strip()
+                                
+                                try:
+                                    parsed_out = json.loads(cleaned_out)
+                                    results.append(parsed_out)
+                                    
+                                    if auto_save:
+                                        cid = cache_manager.save(tool_name, parsed_out, worldview_id=worldview_id)
+                                        cache_ids.append(cid)
+                                        
+                                        if tool_name == "generate_character_network":
+                                            try:
+                                                network_data = parsed_out.get("data", {})
+                                                characters_list = network_data.get("characters", [])
+                                                if characters_list:
+                                                    for new_char in characters_list:
+                                                        single_char_data = {
+                                                            "tool": "generate_related_character",
+                                                            "status": "completed",
+                                                            "data": new_char
+                                                        }
+                                                        cache_manager.save("generate_related_character", single_char_data, worldview_id=worldview_id)
+                                            except Exception as parse_e:
+                                                pass
+                                    yield f"data: {json.dumps({'type': 'step_end', 'step': i, 'result': parsed_out}, ensure_ascii=False)}\n\n"
+                                except json.JSONDecodeError:
+                                    results.append({"tool": tool_name, "status": "completed", "data": step_output})
+                                    yield f"data: {json.dumps({'type': 'step_end', 'step': i, 'result': {'tool': tool_name, 'status': 'completed', 'data': step_output}}, ensure_ascii=False)}\n\n"
+                                    
+                            except Exception as e:
+                                results.append({"tool": tool_name, "status": "failed", "error": str(e)})
+                                yield f"data: {json.dumps({'type': 'step_end', 'step': i, 'result': {'status': 'failed', 'error': str(e)}}, ensure_ascii=False)}\n\n"
+                        
+                        final_res = {
+                            'success': True,
+                            'response': json.dumps(results, ensure_ascii=False),
+                            'cache_ids': cache_ids
+                        }
+                        yield f"data: {json.dumps({'type': 'end', 'content': final_res}, ensure_ascii=False)}\n\n"
+                        return
+                except Exception as e:
+                    yield f"data: {json.dumps({'type': 'error', 'message': str(e)}, ensure_ascii=False)}\n\n"
+                    
+            # Fallback for analysis or single agent
+            yield f"data: {json.dumps({'type': 'status', 'message': '正在处理...'}, ensure_ascii=False)}\n\n"
+            agent_executor = get_agent_executor()
+            try:
+                result = agent_executor.invoke({"input": user_input})
+                output = result['output']
+                
+                cleaned_output = output.strip()
+                if cleaned_output.startswith("```json"): cleaned_output = cleaned_output[7:]
+                elif cleaned_output.startswith("```"): cleaned_output = cleaned_output[3:]
+                if cleaned_output.endswith("```"): cleaned_output = cleaned_output[:-3]
+                cleaned_output = cleaned_output.strip()
+                
+                if cleaned_output.startswith("{") and not cleaned_output.endswith("}"):
+                    cleaned_output += "}"
+                    
+                if auto_save:
+                    try:
+                        result_json = json.loads(cleaned_output)
+                        output = cleaned_output
+                        if isinstance(result_json, list):
+                            for item in result_json:
+                                if isinstance(item, dict) and item.get('tool'):
+                                    cache_manager.save(item.get('tool'), item, worldview_id=worldview_id)
+                        elif isinstance(result_json, dict) and result_json.get('tool'):
+                            cache_manager.save(result_json.get('tool'), result_json, worldview_id=worldview_id)
+                    except Exception:
+                        pass
+                        
+                yield f"data: {json.dumps({'type': 'end', 'content': {'success': True, 'response': output}}, ensure_ascii=False)}\n\n"
+            except Exception as e:
+                yield f"data: {json.dumps({'type': 'end', 'content': {'success': False, 'error': str(e)}}, ensure_ascii=False)}\n\n"
+
+        return app.response_class(
+            generate(),
+            mimetype='text/event-stream',
+            headers={
+                'Cache-Control': 'no-cache',
+                'X-Accel-Buffering': 'no'
+            }
+        )
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 
 @app.route('/api/chat', methods=['POST'])

@@ -411,7 +411,7 @@ export function CachePage() {
                     const data = selectedItem.data?.data || selectedItem.data;
                     console.log(
                       "CachePage -> 尝试渲染的原始数据:",
-                      selectedItem.data
+                      selectedItem.data,
                     );
                     console.log("CachePage -> 剥离一层的 data:", data);
 

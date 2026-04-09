@@ -61,7 +61,7 @@ export function ArticleRenderer({ data }: { data: any }) {
                 >
                   👤 {char}
                 </span>
-              )
+              ),
             )}
           {articleData.word_count && (
             <span

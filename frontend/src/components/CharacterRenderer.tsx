@@ -73,7 +73,7 @@ export function CharacterRenderer({ data }: CharacterRendererProps) {
         <div
           style={{
             background: `linear-gradient(135deg, ${getRoleColor(
-              basicInfo.role
+              basicInfo.role,
             )}33 0%, rgba(139, 92, 246, 0.1) 100%)`,
             borderRadius: "12px",
             padding: "20px",
@@ -557,7 +557,7 @@ export function CharacterRenderer({ data }: CharacterRendererProps) {
                           >
                             {event}
                           </li>
-                        )
+                        ),
                       )}
                     </ul>
                   </div>

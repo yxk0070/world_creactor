@@ -1,54 +1,114 @@
 import { useChat } from "../hooks/useChat";
 import { useRef, useEffect } from "react";
+import { WorldviewRenderer } from "../components/WorldviewRenderer";
+import { CharacterRenderer } from "../components/CharacterRenderer";
+import { StorylineRenderer } from "../components/StorylineRenderer";
+import { ArticleRenderer } from "../components/ArticleRenderer";
+import { CharacterNetworkRenderer } from "../components/CharacterNetworkRenderer";
+import { RelatedCharacterRenderer } from "../components/RelatedCharacterRenderer";
+import { JsonRenderer } from "../components/JsonRenderer";
+import { EditableResult } from "../components/EditableResult";
+import { styles } from "./MainPage.styles";
+
+function ToolCardRenderer({ item }: { item: any }) {
+  if (!item) return null;
+
+  // 1. 如果有明确的 tool 字段，走原本的精确匹配
+  if (item.tool) {
+    switch (item.tool) {
+      case "analyze_worldview":
+      case "generate_worldview":
+        return <WorldviewRenderer data={item} />;
+      case "generate_character":
+        return <CharacterRenderer data={item} />;
+      case "generate_related_character":
+        return <RelatedCharacterRenderer data={item.data || item} />;
+      case "generate_character_network":
+        return <CharacterNetworkRenderer data={item.data || item} />;
+      case "generate_story":
+        return <StorylineRenderer data={item} />;
+      case "extract_timeline": {
+        const events = item.data?.events || item.data?.key_events || [];
+        return (
+          <StorylineRenderer
+            data={{
+              title: item.data?.title || "故事线分析",
+              core_theme: item.data?.core_theme || "时间线提取",
+              key_events: events,
+            }}
+          />
+        );
+      }
+      case "generate_article_from_event":
+        return <ArticleRenderer data={item} />;
+      default:
+        break;
+    }
+  }
+
+  // 2. 如果没有 tool 字段，根据 JSON 结构特征智能推断渲染器
+  const targetData = item.data || item;
+
+  if (
+    targetData &&
+    (targetData.key_events || targetData.title) &&
+    !targetData.characters &&
+    !targetData.content
+  ) {
+    return <StorylineRenderer data={{ data: targetData }} />;
+  } else if (targetData && targetData.world_name && !targetData.characters) {
+    return <WorldviewRenderer data={{ data: targetData }} />;
+  } else if (
+    targetData &&
+    targetData.name &&
+    !targetData.characters &&
+    !targetData.content
+  ) {
+    return <CharacterRenderer data={{ data: targetData }} />;
+  } else if (targetData && targetData.characters && targetData.relationships) {
+    return <CharacterNetworkRenderer data={targetData} />;
+  } else if (
+    targetData &&
+    (targetData.content || targetData.data?.content) &&
+    (targetData.title || targetData.data?.title)
+  ) {
+    return <ArticleRenderer data={{ data: targetData }} />;
+  }
+
+  // 3. Fallback 为更美观的 JsonRenderer
+  return <JsonRenderer data={item} />;
+}
 
 export function MainPage() {
-  const { message, setMessage, chatHistory, isGenerating, handleSubmit } =
-    useChat();
+  const {
+    message,
+    setMessage,
+    chatHistory,
+    isGenerating,
+    handleSubmit,
+    workflowPlan,
+    workflowStatus,
+  } = useChat();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // 自动调整 textarea 高度
   useEffect(() => {
     if (textareaRef.current) {
-      textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height = `${Math.min(
-        textareaRef.current.scrollHeight,
-        200
-      )}px`;
+      textareaRef.current.style.height = "52px"; // 先重置回初始高度
+      const scrollHeight = textareaRef.current.scrollHeight;
+      textareaRef.current.style.height = `${Math.min(scrollHeight, 200)}px`;
     }
   }, [message]);
 
   return (
-    <div
-      style={{
-        maxWidth: "1000px",
-        margin: "0 auto",
-        padding: "32px",
-      }}
-    >
-      <div
-        style={{
-          background: "rgba(30, 41, 59, 0.85)",
-          border: "1px solid rgba(71, 85, 105, 0.5)",
-          borderRadius: "20px",
-          padding: "32px",
-          marginBottom: "24px",
-        }}
-      >
-        <h1
-          style={{
-            fontSize: "28px",
-            fontWeight: "700",
-            marginBottom: "8px",
-            color: "#f8fafc",
-          }}
-        >
-          💬 智能 Agent 对话
-        </h1>
-        <p style={{ color: "#94a3b8", marginBottom: "24px" }}>
+    <div style={styles.container}>
+      <div style={styles.headerCard}>
+        <h1 style={styles.title}>💬 点创世界</h1>
+        <p style={styles.subtitle}>
           输入你的需求，让 AI 帮你生成世界观、人物、故事等
         </p>
 
-        <form onSubmit={handleSubmit} style={{ display: "flex", gap: "12px" }}>
+        <form onSubmit={handleSubmit} style={styles.form}>
           <textarea
             ref={textareaRef}
             value={message}
@@ -61,99 +121,96 @@ export function MainPage() {
             }}
             placeholder="例如：帮我生成一个奇幻世界... (Shift+Enter 换行，Enter 发送)"
             disabled={isGenerating}
-            style={{
-              flex: 1,
-              padding: "14px 20px",
-              border: "2px solid rgba(71, 85, 105, 0.5)",
-              borderRadius: "12px",
-              background: "rgba(15, 23, 42, 0.8)",
-              color: "#f8fafc",
-              fontSize: "15px",
-              minHeight: "48px",
-              maxHeight: "200px",
-              resize: "vertical",
-              fontFamily: "inherit",
-              wordBreak: "break-word",
-            }}
+            rows={1}
+            style={styles.textarea}
           />
           <button
             type="submit"
             disabled={isGenerating}
-            style={{
-              padding: "14px 28px",
-              background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
-              color: "white",
-              border: "none",
-              borderRadius: "12px",
-              cursor: isGenerating ? "not-allowed" : "pointer",
-              fontWeight: "600",
-              fontSize: "15px",
-              opacity: isGenerating ? 0.6 : 1,
-            }}
+            style={styles.submitBtn(isGenerating)}
           >
             {isGenerating ? "生成中..." : "发送"}
           </button>
         </form>
       </div>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-        {chatHistory.map((msg, idx) => (
-          <div
-            key={idx}
-            style={{
-              background:
-                msg.role === "user"
-                  ? "rgba(99, 102, 241, 0.2)"
-                  : "rgba(30, 41, 59, 0.85)",
-              border: "1px solid rgba(71, 85, 105, 0.5)",
-              borderRadius: "16px",
-              padding: "20px 24px",
-            }}
-          >
-            <div
-              style={{
-                fontWeight: "600",
-                marginBottom: "12px",
-                color: msg.role === "user" ? "#a78bfa" : "#10b981",
-              }}
-            >
-              {msg.role === "user" ? "👤 你" : "🤖 AI"}
+      <div style={styles.historyContainer}>
+        {chatHistory.map((msg, idx) => {
+          const isUser = msg.role === "user";
+          return (
+            <div key={idx} style={styles.messageRow(isUser)}>
+              <div style={styles.messageBubble(isUser)}>
+                <div style={styles.messageHeader(isUser)}>
+                  {isUser ? (
+                    <>
+                      <span>👤 你</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>🤖 世界架构师</span>
+                    </>
+                  )}
+                </div>
+                <div style={styles.messageText(isUser)}>{msg.content}</div>
+                {msg.data && (
+                  <div style={styles.cardContainer}>
+                    <EditableResult data={msg.data} defaultTitle="生成结果">
+                      {Array.isArray(msg.data) ? (
+                        <div style={styles.cardList}>
+                          {msg.data.map((item: any, i: number) => (
+                            <ToolCardRenderer key={i} item={item} />
+                          ))}
+                        </div>
+                      ) : (
+                        <div>
+                          <ToolCardRenderer item={msg.data} />
+                        </div>
+                      )}
+                    </EditableResult>
+                  </div>
+                )}
+              </div>
             </div>
-            <div
-              style={{
-                color: "#e2e8f0",
-                whiteSpace: "pre-wrap",
-                wordBreak: "break-word",
-              }}
-            >
-              {msg.content}
-            </div>
-            {msg.data && (
-              <div style={{ marginTop: "16px" }}>
-                <details>
-                  <summary style={{ color: "#94a3b8", cursor: "pointer" }}>
-                    查看详细数据
-                  </summary>
-                  <pre
-                    style={{
-                      marginTop: "12px",
-                      padding: "16px",
-                      background: "rgba(15, 23, 42, 0.6)",
-                      borderRadius: "8px",
-                      fontSize: "13px",
-                      color: "#94a3b8",
-                      overflowX: "auto",
-                      whiteSpace: "pre-wrap",
-                      wordBreak: "break-word",
-                    }}
-                  >
-                    {JSON.stringify(msg.data, null, 2)}
-                  </pre>
-                </details>
+          );
+        })}
+
+        {/* 工作流展示区域移至聊天记录底部 */}
+        {isGenerating && (workflowStatus || workflowPlan.length > 0) && (
+          <div style={styles.workflowContainer}>
+            <h3 style={styles.workflowTitle}>
+              <span style={styles.workflowIcon}>⚙️</span>
+              {workflowStatus || "任务执行中..."}
+            </h3>
+
+            {workflowPlan.length > 0 && (
+              <div style={styles.workflowList}>
+                {workflowPlan.map((step, idx) => (
+                  <div key={idx} style={styles.workflowStep(step.status)}>
+                    <div style={styles.workflowStepIcon(step.status)}>
+                      {step.status === "completed" ? "✓" : idx + 1}
+                    </div>
+                    <div style={styles.workflowStepText}>
+                      <div style={styles.workflowStepDesc}>
+                        {step.description}
+                      </div>
+                      <div style={styles.workflowStepTool}>
+                        工具: {step.tool}
+                      </div>
+                    </div>
+                    <div>
+                      <span style={styles.workflowStatusText(step.status)}>
+                        {step.status === "running" && "执行中..."}
+                        {step.status === "completed" && "已完成"}
+                        {step.status === "failed" && "失败"}
+                        {step.status === "pending" && "等待中"}
+                      </span>
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
           </div>
-        ))}
+        )}
       </div>
     </div>
   );

@@ -214,8 +214,15 @@ class CacheManager:
         print("[缓存] 已清空所有缓存")
     
     def get_all(self) -> Dict[str, List[Dict]]:
-        """获取所有缓存"""
-        return self.cache
+        """获取所有缓存项，按创建时间倒序排列"""
+        sorted_cache = {}
+        for category, items in self.cache.items():
+            sorted_cache[category] = sorted(
+                items, 
+                key=lambda x: x.get("created_at", ""), 
+                reverse=True
+            )
+        return sorted_cache
     
     def get_stats(self) -> Dict[str, int]:
         """获取缓存统计"""
