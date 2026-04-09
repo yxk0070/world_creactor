@@ -17,6 +17,7 @@ export function DialoguePage() {
     setStyle,
     isLoading,
     result,
+    setResult,
     generateDialogue,
     storylines,
     selectedStorylineId,
@@ -225,7 +226,12 @@ export function DialoguePage() {
 
         {result && (
           <div style={{ marginTop: "24px" }}>
-            <EditableResult data={result} defaultTitle="生成的对话文案">
+            <EditableResult
+              data={result}
+              cacheId={result.cache_id || (result as any).cache_id}
+              onSave={(newData) => setResult(newData)}
+              defaultTitle="生成的对话文案"
+            >
               <DialogueRenderer data={result} />
             </EditableResult>
           </div>

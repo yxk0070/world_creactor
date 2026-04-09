@@ -151,13 +151,26 @@ export function useShortScript() {
         setStreamContent("生成完成！");
         try {
           const parsedData = JSON.parse(finalData.response);
-          setResult(
-            Array.isArray(parsedData)
-              ? parsedData[0].data || parsedData[0]
-              : parsedData.data || parsedData
-          );
+          let finalResult = parsedData;
+          if (Array.isArray(parsedData) && parsedData.length > 0) {
+            finalResult = parsedData[0];
+          }
+
+          if (finalData.cache_id) {
+            finalResult.cache_id = finalData.cache_id;
+          } else if (finalData.cache_ids && finalData.cache_ids.length > 0) {
+            finalResult.cache_id = finalData.cache_ids[0];
+          }
+
+          setResult(finalResult);
         } catch (e) {
-          setResult(finalData.data || finalData);
+          let finalFallback = finalData.data || finalData;
+          if (finalData.cache_id) {
+            finalFallback.cache_id = finalData.cache_id;
+          } else if (finalData.cache_ids && finalData.cache_ids.length > 0) {
+            finalFallback.cache_id = finalData.cache_ids[0];
+          }
+          setResult(finalFallback);
         }
         updateTask(taskId, { status: "completed", message: "生成完成" });
       } else {
@@ -184,6 +197,7 @@ export function useShortScript() {
     setStyle,
     isLoading,
     result,
+    setResult,
     generateScript,
     storylines,
     selectedStorylineId,

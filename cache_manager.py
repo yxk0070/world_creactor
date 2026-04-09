@@ -43,7 +43,9 @@ class CacheManager:
             "related_character": [],
             "story": [],
             "timeline": [],
-            "generate_article_from_event": []
+            "generate_article_from_event": [],
+            "generate_dialogue": [],
+            "generate_short_script": []
         }
     
     def _save_cache(self):
@@ -65,8 +67,8 @@ class CacheManager:
             "generate_story": "story",
             "extract_timeline": "story",  # 将故事线分析与核心故事线合并
             "generate_article_from_event": "generate_article_from_event",
-            "generate_dialogue": "dialogue",
-            "generate_short_script": "short_script"
+            "generate_dialogue": "generate_dialogue",
+            "generate_short_script": "generate_short_script"
         }
         return category_map.get(tool_name)
     
@@ -136,6 +138,10 @@ class CacheManager:
             # analyze_worldview is handled above
             elif tool_name == "generate_article_from_event":
                 return data.get("data", {}).get("title", f"事件文章_{datetime.now().strftime('%Y%m%d_%H%M%S')}")
+            elif tool_name == "generate_dialogue":
+                return f"对话文案_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+            elif tool_name == "generate_short_script":
+                return f"短剧脚本_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
             return "未命名"
         except Exception as e:
             print(f"[警告] 生成默认名称失败: {e}")

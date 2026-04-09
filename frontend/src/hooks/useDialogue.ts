@@ -154,13 +154,29 @@ export function useDialogue() {
         setStreamContent("生成完成！");
         try {
           const parsedData = JSON.parse(finalData.response);
-          setResult(
-            Array.isArray(parsedData)
-              ? parsedData[0].data || parsedData[0]
-              : parsedData.data || parsedData
-          );
+          // 注意：parsedData 可能是一个数组，并且每个元素的结构是 {"tool": "xxx", "status": "xxx", "data": {...}}
+          // 或者直接是一个对象
+          let finalResult = parsedData;
+          if (Array.isArray(parsedData) && parsedData.length > 0) {
+            finalResult = parsedData[0];
+          }
+
+          // 保持完整结构，只注入 cache_id
+          if (finalData.cache_id) {
+            finalResult.cache_id = finalData.cache_id;
+          } else if (finalData.cache_ids && finalData.cache_ids.length > 0) {
+            finalResult.cache_id = finalData.cache_ids[0];
+          }
+
+          setResult(finalResult);
         } catch (e) {
-          setResult(finalData.data || finalData);
+          let finalFallback = finalData.data || finalData;
+          if (finalData.cache_id) {
+            finalFallback.cache_id = finalData.cache_id;
+          } else if (finalData.cache_ids && finalData.cache_ids.length > 0) {
+            finalFallback.cache_id = finalData.cache_ids[0];
+          }
+          setResult(finalFallback);
         }
         updateTask(taskId, { status: "completed", message: "生成完成" });
       } else {
@@ -189,6 +205,7 @@ export function useDialogue() {
     setStyle,
     isLoading,
     result,
+    setResult,
     generateDialogue,
     storylines,
     selectedStorylineId,

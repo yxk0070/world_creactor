@@ -23,8 +23,8 @@ const categoryNames: { [key: string]: string } = {
   related_character: "🔗 关联人物",
   story: "📜 故事线",
   generate_article_from_event: "✍️ 事件文章",
-  dialogue: "💬 对话文案",
-  short_script: "🎬 短句脚本",
+  generate_dialogue: "💬 对话文案",
+  generate_short_script: "🎬 短剧脚本",
 };
 
 export function useCache() {
