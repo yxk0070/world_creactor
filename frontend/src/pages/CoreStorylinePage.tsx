@@ -12,6 +12,8 @@ export function CoreStorylinePage() {
     selectedCharacterIds,
     storyScale,
     setStoryScale,
+    generateDetails,
+    setGenerateDetails,
     isLoading,
     result,
     setResult,
@@ -26,10 +28,10 @@ export function CoreStorylinePage() {
   } = useCoreStoryline();
 
   const mainCharacters = filteredCharacters.filter(
-    (c: any) => c._source !== "related",
+    (c: any) => c._source !== "related"
   );
   const relatedCharacters = filteredCharacters.filter(
-    (c: any) => c._source === "related",
+    (c: any) => c._source === "related"
   );
 
   return (
@@ -134,11 +136,33 @@ export function CoreStorylinePage() {
                   onChange={(e) => setStoryScale(e.target.value)}
                   style={styles.select}
                 >
-                  <option value="短篇">短篇</option>
-                  <option value="中篇">中篇</option>
-                  <option value="长篇">长篇</option>
-                  <option value="史诗">史诗</option>
+                  <option value="迷你">迷你（约5个事件）</option>
+                  <option value="短篇">短篇（约10-15个事件）</option>
+                  <option value="中篇">中篇（约15-25个事件）</option>
+                  <option value="长篇">长篇（约30+个事件）</option>
+                  <option value="史诗">史诗（宏大架构）</option>
                 </select>
+              </label>
+
+              <label style={styles.label}>
+                生成细节节点
+                <div
+                  style={{
+                    marginTop: "8px",
+                    display: "flex",
+                    alignItems: "center",
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={generateDetails}
+                    onChange={(e) => setGenerateDetails(e.target.checked)}
+                    style={{ marginRight: "8px" }}
+                  />
+                  <span style={{ fontSize: "14px", color: "#cbd5e1" }}>
+                    同时为每个事件生成5-8个细节子节点（耗时较长）
+                  </span>
+                </div>
               </label>
             </div>
 
@@ -171,10 +195,16 @@ export function CoreStorylinePage() {
             >
               <div style={styles.resultContent}>
                 {(() => {
-                  let parsedResult = result;
-                  if ((result as any).response) {
+                  let parsedResult: any = result;
+                  if (
+                    result &&
+                    typeof result === "object" &&
+                    (result as any).response
+                  ) {
                     try {
                       parsedResult = JSON.parse((result as any).response);
+                      if ((result as any).cache_id)
+                        parsedResult.cache_id = (result as any).cache_id;
                     } catch (e) {
                       console.log("解析故事线结果失败:", e);
                     }
@@ -184,6 +214,13 @@ export function CoreStorylinePage() {
                     } catch (e) {
                       console.log("解析故事线结果失败:", e);
                     }
+                  } else if (
+                    result &&
+                    typeof result === "object" &&
+                    (result as any).cache_id
+                  ) {
+                    // 确保即使 result 已经是结构化对象，也将 cache_id 传给 parsedResult
+                    parsedResult.cache_id = (result as any).cache_id;
                   }
 
                   // 检查是否包含有效的结构化数据

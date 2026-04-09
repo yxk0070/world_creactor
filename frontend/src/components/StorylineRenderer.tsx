@@ -1,20 +1,130 @@
+import { useState, useEffect } from "react";
+import { useTasks } from "../contexts/TaskContext";
+
 interface StorylineRendererProps {
   data: any;
 }
 
 export function StorylineRenderer({ data }: StorylineRendererProps) {
-  if (!data) return null;
+  const [localData, setLocalData] = useState<any>(null);
+  const [loadingEventIndex, setLoadingEventIndex] = useState<number | null>(
+    null
+  );
+  const { addTask, updateTask } = useTasks();
 
-  // 处理可能存在的数据层级嵌套
-  let storylineData = data;
-  if (data.data) {
-    storylineData = data.data;
-    if (storylineData.data) {
-      storylineData = storylineData.data;
+  useEffect(() => {
+    if (data) {
+      let storylineData = data;
+      // 循环解包，直到找到真正包含 key_events 或 title 的数据层
+      while (
+        storylineData &&
+        storylineData.data &&
+        !storylineData.key_events &&
+        !storylineData.title
+      ) {
+        storylineData = storylineData.data;
+      }
+      setLocalData(storylineData);
     }
-  }
+  }, [data]);
 
-  const { title, story_scale, genre, core_theme, key_events } = storylineData;
+  const handleGenerateDetails = async (index: number, event: any) => {
+    if (loadingEventIndex !== null) return;
+    setLoadingEventIndex(index);
+
+    const eventTitle = event.event_title || event.title || `事件 ${index + 1}`;
+    const taskId = addTask({
+      title: `生成细节：${eventTitle}`,
+      message: "正在展开细节节点...",
+    });
+
+    try {
+      const prompt = `请对故事中的事件进行展开，生成5-8个细节子节点。故事上下文：${localData.story_summary || localData.core_theme || "无"}。事件标题：${eventTitle}\n事件描述：${event.description}\n\n请必须使用 expand_story_event 工具并返回其 JSON 格式结果。`;
+
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: prompt, auto_save: false }),
+      });
+
+      const resData = await response.json();
+      if (resData.success) {
+        let parsed = null;
+        try {
+          parsed = JSON.parse(resData.response);
+          if (parsed.data) parsed = parsed.data;
+        } catch (e) {
+          console.error("Failed to parse detail response", resData.response);
+        }
+
+        if (parsed && parsed.sub_events) {
+          setLocalData((prev: any) => {
+            const newData = { ...prev };
+            newData.key_events[index] = {
+              ...newData.key_events[index],
+              sub_events: parsed.sub_events,
+            };
+
+            // 如果存在 cache_id，自动触发一次后端保存
+            if (data.id || data.cacheId || data.cache_id || data.cache?.id) {
+              const targetId =
+                data.id || data.cacheId || data.cache_id || data.cache?.id;
+
+              // 保证发回后端的数据结构与原始保持一致，避免被包裹多层 data
+              let payloadData = { ...data };
+              if (payloadData.data && payloadData.data.data) {
+                payloadData.data.data = newData;
+              } else if (payloadData.data) {
+                payloadData.data = newData;
+              } else {
+                payloadData = newData;
+              }
+
+              fetch("/api/cache/update", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  id: targetId,
+                  data: payloadData,
+                }),
+              }).catch((e) =>
+                console.error("Failed to sync sub_events to cache:", e)
+              );
+            }
+
+            return newData;
+          });
+
+          updateTask(taskId, {
+            status: "completed",
+            message: "细节生成完成！",
+          });
+        } else {
+          updateTask(taskId, {
+            status: "error",
+            message: "返回数据结构不匹配",
+          });
+        }
+      } else {
+        updateTask(taskId, {
+          status: "error",
+          message: resData.error || "请求失败",
+        });
+      }
+    } catch (error) {
+      console.error("生成细节失败:", error);
+      updateTask(taskId, {
+        status: "error",
+        message: "网络请求异常",
+      });
+    } finally {
+      setLoadingEventIndex(null);
+    }
+  };
+
+  if (!localData) return null;
+
+  const { title, story_scale, genre, core_theme, key_events } = localData;
 
   return (
     <div style={{ maxWidth: "100%" }}>
@@ -148,17 +258,55 @@ export function StorylineRenderer({ data }: StorylineRendererProps) {
                         border: "1px solid rgba(71, 85, 105, 0.5)",
                       }}
                     >
-                      <h3
+                      <div
                         style={{
-                          fontSize: "16px",
-                          fontWeight: "600",
-                          color: "#e2e8f0",
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "flex-start",
                           marginBottom: "8px",
                         }}
                       >
-                        {event.event_title ||
-                          `事件 ${event.event_order || index + 1}`}
-                      </h3>
+                        <h3
+                          style={{
+                            fontSize: "16px",
+                            fontWeight: "600",
+                            color: "#e2e8f0",
+                            margin: 0,
+                          }}
+                        >
+                          {event.event_title ||
+                            `事件 ${event.event_order || index + 1}`}
+                        </h3>
+
+                        {(!event.sub_events ||
+                          event.sub_events.length === 0) && (
+                          <button
+                            onClick={() => handleGenerateDetails(index, event)}
+                            disabled={loadingEventIndex !== null}
+                            style={{
+                              padding: "4px 8px",
+                              fontSize: "12px",
+                              cursor:
+                                loadingEventIndex !== null
+                                  ? "not-allowed"
+                                  : "pointer",
+                              background: "rgba(99, 102, 241, 0.2)",
+                              color: "#a5b4fc",
+                              border: "1px solid rgba(99, 102, 241, 0.3)",
+                              borderRadius: "4px",
+                              opacity:
+                                loadingEventIndex !== null &&
+                                loadingEventIndex !== index
+                                  ? 0.5
+                                  : 1,
+                            }}
+                          >
+                            {loadingEventIndex === index
+                              ? "生成中..."
+                              : "✨ 生成细节"}
+                          </button>
+                        )}
+                      </div>
 
                       {event.description && (
                         <p
@@ -215,7 +363,7 @@ export function StorylineRenderer({ data }: StorylineRendererProps) {
                               >
                                 👤 {char}
                               </span>
-                            ),
+                            )
                           )}
                       </div>
 
@@ -237,6 +385,64 @@ export function StorylineRenderer({ data }: StorylineRendererProps) {
                           >
                             {event.significance}
                           </span>
+                        </div>
+                      )}
+
+                      {/* 渲染子节点细节 */}
+                      {event.sub_events && event.sub_events.length > 0 && (
+                        <div
+                          style={{
+                            marginTop: "16px",
+                            paddingLeft: "16px",
+                            borderLeft: "2px solid rgba(71, 85, 105, 0.4)",
+                          }}
+                        >
+                          {event.sub_events.map(
+                            (sub: any, subIndex: number) => (
+                              <div
+                                key={subIndex}
+                                style={{ marginBottom: "12px" }}
+                              >
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: "8px",
+                                    marginBottom: "4px",
+                                  }}
+                                >
+                                  <span
+                                    style={{
+                                      color: "#8b5cf6",
+                                      fontSize: "12px",
+                                      fontWeight: "bold",
+                                    }}
+                                  >
+                                    ◆
+                                  </span>
+                                  <span
+                                    style={{
+                                      color: "#e2e8f0",
+                                      fontSize: "14px",
+                                      fontWeight: "600",
+                                    }}
+                                  >
+                                    {sub.title}
+                                  </span>
+                                </div>
+                                <div
+                                  style={{
+                                    color: "#cbd5e1",
+                                    fontSize: "13px",
+                                    lineHeight: "1.6",
+                                    paddingLeft: "16px",
+                                  }}
+                                >
+                                  {sub.description}
+                                </div>
+                              </div>
+                            )
+                          )}
                         </div>
                       )}
                     </div>

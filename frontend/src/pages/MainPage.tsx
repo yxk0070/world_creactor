@@ -4,6 +4,8 @@ import { WorldviewRenderer } from "../components/WorldviewRenderer";
 import { CharacterRenderer } from "../components/CharacterRenderer";
 import { StorylineRenderer } from "../components/StorylineRenderer";
 import { ArticleRenderer } from "../components/ArticleRenderer";
+import { DialogueRenderer } from "../components/DialogueRenderer";
+import { ShortScriptRenderer } from "../components/ShortScriptRenderer";
 import { CharacterNetworkRenderer } from "../components/CharacterNetworkRenderer";
 import { RelatedCharacterRenderer } from "../components/RelatedCharacterRenderer";
 import { JsonRenderer } from "../components/JsonRenderer";
@@ -28,19 +30,26 @@ function ToolCardRenderer({ item }: { item: any }) {
       case "generate_story":
         return <StorylineRenderer data={item} />;
       case "extract_timeline": {
-        const events = item.data?.events || item.data?.key_events || [];
+        const events = item.data?.key_events || item.data?.events || [];
         return (
           <StorylineRenderer
             data={{
               title: item.data?.title || "故事线分析",
               core_theme: item.data?.core_theme || "时间线提取",
+              story_scale: item.data?.story_scale,
+              genre: item.data?.genre,
               key_events: events,
+              id: item.id || item.cache_id,
             }}
           />
         );
       }
       case "generate_article_from_event":
         return <ArticleRenderer data={item} />;
+      case "generate_dialogue":
+        return <DialogueRenderer data={item} />;
+      case "generate_short_script":
+        return <ShortScriptRenderer data={item} />;
       default:
         break;
     }
@@ -55,7 +64,11 @@ function ToolCardRenderer({ item }: { item: any }) {
     !targetData.characters &&
     !targetData.content
   ) {
-    return <StorylineRenderer data={{ data: targetData }} />;
+    return (
+      <StorylineRenderer
+        data={{ data: targetData, id: item.id || item.cache_id }}
+      />
+    );
   } else if (targetData && targetData.world_name && !targetData.characters) {
     return <WorldviewRenderer data={{ data: targetData }} />;
   } else if (
@@ -67,6 +80,10 @@ function ToolCardRenderer({ item }: { item: any }) {
     return <CharacterRenderer data={{ data: targetData }} />;
   } else if (targetData && targetData.characters && targetData.relationships) {
     return <CharacterNetworkRenderer data={targetData} />;
+  } else if (targetData && (targetData.dialogue || targetData.data?.dialogue)) {
+    return <DialogueRenderer data={{ data: targetData }} />;
+  } else if (targetData && (targetData.script || targetData.data?.script)) {
+    return <ShortScriptRenderer data={{ data: targetData }} />;
   } else if (
     targetData &&
     (targetData.content || targetData.data?.content) &&

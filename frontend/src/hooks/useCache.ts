@@ -16,15 +16,15 @@ interface Stats {
   [key: string]: number;
 }
 
-const categoryNames = {
+const categoryNames: { [key: string]: string } = {
   worldview: "🌍 世界观",
   worldview_analysis: "🔍 世界观分析",
   character: "👤 人物",
   related_character: "🔗 关联人物",
-  generate_character_network: "🕸️ 人物关系网",
-  story: "📜 核心故事线",
-  timeline: "📊 时间线",
+  story: "📜 故事线",
   generate_article_from_event: "✍️ 事件文章",
+  dialogue: "💬 对话文案",
+  short_script: "🎬 短句脚本",
 };
 
 export function useCache() {
@@ -84,7 +84,7 @@ export function useCache() {
         data.data.forEach((item: CacheItem) => {
           const category =
             Object.keys(categoryNames).find((cat) =>
-              cacheData[cat]?.some((c) => c.id === item.id),
+              cacheData[cat]?.some((c) => c.id === item.id)
             ) || "search";
           if (!searchResults[category]) {
             searchResults[category] = [];
@@ -124,7 +124,7 @@ export function useCache() {
       !window.confirm(
         `确定要清空 ${
           categoryNames[category as keyof typeof categoryNames] || category
-        } 分类的所有历史记录吗？`,
+        } 分类的所有历史记录吗？`
       )
     )
       return;

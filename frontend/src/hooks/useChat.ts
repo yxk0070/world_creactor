@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useScenario } from "../contexts/ScenarioContext";
 
 export interface WorkflowStep {
   step: number;
@@ -21,6 +22,7 @@ export function useChat() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [workflowPlan, setWorkflowPlan] = useState<WorkflowStep[]>([]);
   const [workflowStatus, setWorkflowStatus] = useState<string>("");
+  const { scenario } = useScenario();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +38,7 @@ export function useChat() {
       const response = await fetch("/api/chat/workflow", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message, auto_save: true }),
+        body: JSON.stringify({ message, auto_save: true, scenario }),
       });
 
       if (!response.body) throw new Error("No readable stream");
@@ -216,5 +218,6 @@ export function useChat() {
     handleSubmit,
     workflowPlan,
     workflowStatus,
+    scenario,
   };
 }

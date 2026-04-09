@@ -40,7 +40,7 @@ export const styles = {
     fontFamily: "inherit",
     wordBreak: "break-word" as const,
     boxSizing: "border-box" as const,
-    overflowY: "auto" as const,
+    overflowY: "hidden" as const,
     lineHeight: "1.5",
   },
   submitBtn: (isGenerating: boolean) => ({

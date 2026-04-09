@@ -215,7 +215,7 @@ def analyze_worldview(article: str) -> str:
 
 
 @tool
-def generate_story(time: str = "未指定时间", place: str = "未指定地点", characters: str = "未指定人物", genre: str = "冒险", story_scale: str = "中等", worldview: str = "") -> str:
+def generate_story(time: str = "未指定时间", place: str = "未指定地点", characters: str = "未指定人物", genre: str = "冒险", story_scale: str = "中等", worldview: str = "", generate_details: bool = False) -> str:
     """
     生成核心故事线。当用户需要创作故事、生成故事线、
     或者提供了时间地点人物/世界观信息想要生成故事时使用此工具。
@@ -227,11 +227,12 @@ def generate_story(time: str = "未指定时间", place: str = "未指定地点"
         genre: 故事类型（冒险/悬疑/爱情/科幻/童话等）
         story_scale: 故事规模（简短/中等/长篇）
         worldview: 世界观背景（可选）。如果提供了世界观，故事必须严格在该世界观的设定下发生，不能随意穿越或脱离该世界观。
+        generate_details: 是否同时为故事线中的每个关键事件生成5-8个细节节点（默认False）
         
     Returns:
         JSON格式的故事生成信息
     """
-    print(f"[DEBUG] generate_story 被调用，time={time}, place={place}, characters={characters}, worldview={worldview}")
+    print(f"[DEBUG] generate_story 被调用，time={time}, place={place}, characters={characters}, worldview={worldview}, generate_details={generate_details}")
     return json.dumps({
         "tool": "generate_story",
         "status": "processing",
@@ -241,7 +242,33 @@ def generate_story(time: str = "未指定时间", place: str = "未指定地点"
             "characters": characters,
             "genre": genre,
             "story_scale": story_scale,
-            "worldview": worldview
+            "worldview": worldview,
+            "generate_details": generate_details
+        }
+    }, ensure_ascii=False)
+
+@tool
+def expand_story_event(story_context: str, event_title: str, event_description: str) -> str:
+    """
+    对故事线中的某个核心事件节点进行展开，生成5-8个细节子节点。
+    当用户选择了一个故事事件，并要求补充细节节点时使用此工具。
+    
+    Args:
+        story_context: 完整的故事背景/核心主题上下文
+        event_title: 需要展开的事件标题
+        event_description: 需要展开的事件描述
+        
+    Returns:
+        JSON格式的事件细节节点生成信息
+    """
+    print(f"[DEBUG] expand_story_event 被调用，event_title={event_title}")
+    return json.dumps({
+        "tool": "expand_story_event",
+        "status": "processing",
+        "parameters": {
+            "story_context": story_context,
+            "event_title": event_title,
+            "event_description": event_description
         }
     }, ensure_ascii=False)
 
@@ -344,7 +371,7 @@ def generate_article_from_event(event_description: str, context: str = "", style
     Args:
         event_description: 事件节点的描述
         context: 世界观、人物背景等上下文信息（可选）
-        style: 文章风格（叙事/抒情/写实/剧本等）
+        style: 文章风格，可选值包括：叙事、抒情、写实、剧本、史诗、武侠、悬疑、二次元、古典小说、书面报告、翻译腔、评书等
         
     Returns:
         JSON格式的文章生成信息
@@ -352,6 +379,56 @@ def generate_article_from_event(event_description: str, context: str = "", style
     print(f"[DEBUG] generate_article_from_event 被调用，event={event_description}, style={style}")
     return json.dumps({
         "tool": "generate_article_from_event",
+        "status": "processing",
+        "parameters": {
+            "event_description": event_description,
+            "context": context,
+            "style": style
+        }
+    }, ensure_ascii=False)
+
+@tool
+def generate_dialogue(event_description: str, characters: str = "", context: str = "", style: str = "日常交谈") -> str:
+    """
+    生成一段对话文案。当用户需要根据事件生成角色之间的详细对话或互动文案时使用此工具。
+    
+    Args:
+        event_description: 事件节点的描述
+        characters: 参与对话的人物（可选）
+        context: 场景背景等上下文信息（可选）
+        style: 对话风格，如日常交谈、激烈争吵、暗流涌动等
+        
+    Returns:
+        JSON格式的对话生成信息
+    """
+    print(f"[DEBUG] generate_dialogue 被调用，event={event_description}, characters={characters}, style={style}")
+    return json.dumps({
+        "tool": "generate_dialogue",
+        "status": "processing",
+        "parameters": {
+            "event_description": event_description,
+            "characters": characters,
+            "context": context,
+            "style": style
+        }
+    }, ensure_ascii=False)
+
+@tool
+def generate_short_script(event_description: str, context: str = "", style: str = "快节奏分镜") -> str:
+    """
+    生成短句脚本/分镜脚本。当用户需要将事件转换为简短的镜头脚本、短视频文案或分镜描述时使用此工具。
+    
+    Args:
+        event_description: 事件节点的描述
+        context: 场景背景等上下文信息（可选）
+        style: 脚本风格，如快节奏分镜、情绪慢镜头、混剪风格等
+        
+    Returns:
+        JSON格式的短句脚本生成信息
+    """
+    print(f"[DEBUG] generate_short_script 被调用，event={event_description}, style={style}")
+    return json.dumps({
+        "tool": "generate_short_script",
         "status": "processing",
         "parameters": {
             "event_description": event_description,
@@ -400,7 +477,7 @@ class TaskStep(BaseModel):
 class TaskPlan(BaseModel):
     plan: list[TaskStep] = Field(description="按顺序排列的执行步骤列表")
 
-def get_research_agent_executor():
+def get_research_agent_executor(scenario: str = "小说"):
     """
     获取研究员 Agent 执行器，用于将复杂的用户输入拆解成具体的任务步骤
     """
@@ -416,8 +493,15 @@ def get_research_agent_executor():
         openai_api_base=base_url
     )
 
-    system_prompt = """你是一个专业的 AI 任务拆解研究员。
+    system_prompt = f"""你是一个专业的 AI 任务拆解研究员。
 你的任务是将用户复杂的创作需求，拆解成一系列可以由基础 AI 工具按顺序执行的步骤。
+
+当前用户的创作使用场景是：【{scenario}】。
+请在拆解任务和规划工具参数时，确保生成的内容风格、设定侧重点等高度符合该场景的需求。
+例如：
+- 游戏场景：注重数值体系、关卡设计、派系平衡和互动性机制。
+- 小说场景：注重剧情张力、人物心理描写、环境烘托和文学性设定。
+- 剧本场景：注重对话、场景调度、镜头感、动作描写。
 
 目前我们支持以下基础工具（你的拆解步骤只能使用这些工具）：
 1. generate_worldview - 生成完整的世界观设定（需要指定 genre、theme 等）
@@ -428,6 +512,8 @@ def get_research_agent_executor():
 6. extract_timeline - 用于分析文章并提取事件时间线
 7. analyze_worldview - 用于从文章中提取和分析世界观内容
 8. generate_article_from_event - 根据事件节点生成具体文章
+9. generate_dialogue - 根据事件生成角色间的对话文案
+10. generate_short_script - 根据事件生成短句/分镜脚本
 
 【输出要求】
 你必须返回一个严格的 JSON 格式数组，数组中每个元素代表一个执行步骤。不要包含任何 markdown 标记或其他说明文字！
@@ -436,24 +522,24 @@ def get_research_agent_executor():
 
 JSON 格式示例：
 [
-  {{
+  {{{{
     "step": 1,
     "tool": "generate_worldview",
     "description": "生成末日世界观",
-    "parameters": {{
+    "parameters": {{{{
       "genre": "末世",
       "theme": "寻找物资"
-    }}
-  }},
-  {{
+    }}}}
+  }}}},
+  {{{{
     "step": 2,
     "tool": "generate_character",
     "description": "生成主角张三",
-    "parameters": {{
+    "parameters": {{{{
       "name": "张三",
       "role": "主角"
-    }}
-  }}
+    }}}}
+  }}}}
 ]
 """
     prompt = ChatPromptTemplate.from_messages([
@@ -466,7 +552,7 @@ JSON 格式示例：
     chain = prompt | structured_llm
     return chain
 
-def get_agent_executor():
+def get_agent_executor(scenario: str = "小说"):
     """
     获取 agent 执行器
     """
@@ -486,31 +572,42 @@ def get_agent_executor():
         openai_api_base=base_url
     )
     
-    tools = [extract_timeline, analyze_worldview, generate_story, generate_worldview, generate_character, generate_related_character, generate_article_from_event, generate_character_network]
+    tools = [extract_timeline, analyze_worldview, generate_story, expand_story_event, generate_worldview, generate_character, generate_related_character, generate_article_from_event, generate_dialogue, generate_short_script, generate_character_network]
 
     prompt = ChatPromptTemplate.from_messages(
         [
-            ("system", """你是一个智能助手，可以根据用户的需求选择合适的工具来完成任务。
+            ("system", f"""你是一个智能助手，可以根据用户的需求选择合适的工具来完成任务。
+当前用户的创作使用场景是：【{scenario}】。
+请确保所有生成的内容（世界观、人物、故事等）都高度契合该场景的特点：
+- 游戏场景：生成的数据需注重系统机制、数值概念、派系势力平衡、关卡地形设计和玩家互动性。
+- 小说场景：生成的数据需注重剧情悬念张力、深刻的人物心理与动机描写、环境氛围烘托和文学性。
+- 剧本场景：生成的数据需注重角色间的台词对话、场景内外调度、镜头表现感和具体的动作指示。
 
-你有八个工具可用：
+你有十一个工具可用：
 1. extract_timeline - 用于分析文章并提取事件时间线
 2. analyze_worldview - 用于从文章中提取和分析世界观内容
 3. generate_story - 用于根据时间、地点、人物等信息创作故事
-4. generate_worldview - 用于生成完整的世界观设定
-5. generate_character - 用于结合世界观生成人物设定
-6. generate_related_character - 用于根据已有角色生成关联人物（朋友、敌人、家人等）
-7. generate_article_from_event - 用于根据事件线中的某个事件节点生成具体文章
-8. generate_character_network - 用于生成多个人物之间复杂的关系网
+4. expand_story_event - 用于对故事线中的某个核心事件节点进行展开，生成细节子节点
+5. generate_worldview - 用于生成完整的世界观设定
+6. generate_character - 用于结合世界观生成人物设定
+7. generate_related_character - 用于根据已有角色生成关联人物（朋友、敌人、家人等）
+8. generate_article_from_event - 用于根据事件线中的某个事件节点生成具体文章
+9. generate_character_network - 用于生成多个人物之间复杂的关系网
+10. generate_dialogue - 用于根据事件生成角色间的对话文案
+11. generate_short_script - 用于根据事件生成短句/分镜脚本
 
 【判断规则】
 - 如果用户提供了一篇文章、或者提到"分析"、"梳理"、"时间线"、"事件发展"等关键词 → 使用 extract_timeline
 - 如果用户提供了一篇文章、小说片段，或者提到"分析世界观"、"提取世界观"、"从文章中分析"等关键词 → 使用 analyze_worldview
 - 如果用户提供了时间、地点、人物等信息，或者提到"写故事"、"创作"、"编故事"等关键词 → 使用 generate_story
+- 如果用户提到"展开事件"、"补充细节"、"生成细节节点"等关键词 → 使用 expand_story_event
 - 如果用户提到"世界观"、"世界设定"、"创建世界"、"设定世界"等关键词 → 使用 generate_worldview
 - 如果用户提到"人物"、"角色"、"创建人物"、"生成角色"、"人物设定"等关键词（没有强调关系网） → 使用 generate_character
 - 如果用户提到"为某某生成朋友"、"创建某某的敌人"、"生成某某的家人"等单一关联人物关键词 → 使用 generate_related_character
-- 如果用户提到"根据事件生成文章"、"展开事件"、"描写这个事件"等关键词 → 使用 generate_article_from_event
+- 如果用户提到"根据事件生成文章"、"描写这个事件"等关键词 → 使用 generate_article_from_event
 - 如果用户提到"生成人物关系网"、"关系网"、"多个人物之间的关系"等关键词 → 使用 generate_character_network
+- 如果用户提到"对话"、"对话文案"、"角色交流"等关键词 → 使用 generate_dialogue
+- 如果用户提到"短句"、"脚本"、"分镜"等关键词 → 使用 generate_short_script
 - 如果信息不完整，先询问用户需要什么类型的帮助
 
 【重要要求】
@@ -526,83 +623,83 @@ def get_agent_executor():
 
 【人物生成 JSON 格式】
 如果使用 generate_character，请返回以下 JSON 格式：
-{{
+{{{{
   "tool": "generate_character",
   "status": "completed",
-  "data": {{
+  "data": {{{{
     "name": "人物姓名",
-    "basic_info": {{
+    "basic_info": {{{{
       "role": "角色定位",
       "age": "年龄",
       "appearance": "外貌特征",
       "is_important": true/false
-    }},
+    }}}},
     "personality": "性格特质",
     "background": "背景故事",
     "abilities": ["能力1", "能力2"],
     "position_in_world": "在世界观中的位置",
-    "life_experience": {{
+    "life_experience": {{{{
       "birth": "出生背景",
       "childhood": "童年经历",
       "growth": "成长历程",
       "major_events": ["重大事件1", "重大事件2"],
       "death": "死亡结局（如适用）"
-    }}
-  }}
-}}
+    }}}}
+  }}}}
+}}}}
 
 【关联人物生成 JSON 格式】
 如果使用 generate_related_character，请返回以下 JSON 格式：
-{{
+{{{{
   "tool": "generate_related_character",
   "status": "completed",
-  "data": {{
+  "data": {{{{
     "name": "人物姓名",
-    "basic_info": {{
+    "basic_info": {{{{
       "role": "角色定位",
       "age": "年龄",
       "appearance": "外貌特征",
       "is_important": true/false
-    }},
+    }}}},
     "personality": "性格特质",
     "background": "背景故事",
     "abilities": ["能力1", "能力2"],
     "position_in_world": "在世界观中的位置",
-    "life_experience": {{
+    "life_experience": {{{{
       "birth": "出生背景",
       "childhood": "童年经历",
       "growth": "成长历程",
       "major_events": ["重大事件1", "重大事件2"],
       "death": "死亡结局（如适用）"
-    }},
+    }}}},
     "relationships": [
-      {{
+      {{{{
         "target": "基础人物姓名",
         "type": "关系类型",
         "description": "关系描述"
-      }}
+      }}}}
     ]
-  }}
-}}
+  }}}}
+}}}}
 
 【世界观生成 JSON 格式】
 如果使用 generate_worldview，请返回以下 JSON 格式：
-{{
+{{{{
   "tool": "generate_worldview",
   "status": "completed",
-  "data": {{
+  "data": {{{{
     "world_name": "（根据主题自由发挥创造一个有创意的专属世界名称，切勿直接使用样例名称）",
-    "basic_settings": {{
+    "basic_settings": {{{{
       "genre": "世界类型",
       "magic_level": "魔法水平",
       "technology_level": "科技水平",
       "core_theme": "核心主题"
-    }},
+    }}}},
     "geography": "地理环境描述",
     "social_structure": "社会结构描述",
     "history": "历史背景描述",
     "factions": [
-      {{
+      {{{{
         "name": "势力名称",
         "description": "势力描述",
         "leader": "领袖人物",
@@ -610,29 +707,29 @@ def get_agent_executor():
         "ideology": "核心理念",
         "strengths": ["优势1", "优势2"],
         "weaknesses": ["劣势1", "劣势2"]
-      }}
+      }}}}
     ]
-  }}
-}}
+  }}}}
+}}}}
 
 【世界观分析 JSON 格式】
 如果使用 analyze_worldview，请返回以下 JSON 格式（与 generate_worldview 保持一致）：
-{{
+{{{{
   "tool": "analyze_worldview",
   "status": "completed",
-  "data": {{
+  "data": {{{{
     "world_name": "世界名称",
-    "basic_settings": {{
+    "basic_settings": {{{{
       "genre": "世界类型",
       "magic_level": "魔法水平/个体战斗力水平",
       "technology_level": "科技水平",
       "core_theme": "核心主题"
-    }},
+    }}}},
     "geography": "地理环境描述",
     "social_structure": "社会结构描述",
     "history": "历史背景描述",
     "factions": [
-      {{
+      {{{{
         "name": "势力名称",
         "description": "势力描述",
         "leader": "领袖人物",
@@ -640,53 +737,64 @@ def get_agent_executor():
         "ideology": "核心理念",
         "strengths": ["优势1", "优势2"],
         "weaknesses": ["劣势1", "劣势2"]
-      }}
+      }}}}
     ]
-  }}
-}}
+  }}}}
+}}}}
 
 【故事生成 JSON 格式】
 如果使用 generate_story，请返回以下 JSON 格式。要求生成多个关键事件串联成完整故事：
-{{
+{{{{
   "tool": "generate_story",
   "status": "completed",
-  "data": {{
+  "data": {{{{
     "title": "故事标题",
     "story_scale": "故事规模（简短/中等/长篇）",
     "genre": "故事类型",
     "core_theme": "核心主题",
     "key_events": [
-      {{
+      {{{{
         "event_order": 1,
         "event_title": "事件标题",
         "description": "事件详细描述",
         "key_characters": ["人物1", "人物2"],
         "location": "事件发生地点",
-        "significance": "事件在故事中的意义"
-      }},
-      {{
+        "significance": "事件在故事中的意义",
+        "sub_events": [
+          {{{{
+            "sub_order": 1,
+            "title": "细节节点标题",
+            "description": "细节节点描述"
+          }}}}
+        ]
+      }}}},
+      {{{{
         "event_order": 2,
         "event_title": "事件标题",
         "description": "事件详细描述",
         "key_characters": ["人物1", "人物2"],
         "location": "事件发生地点",
-        "significance": "事件在故事中的意义"
-      }}
+        "significance": "事件在故事中的意义",
+        "sub_events": []
+      }}}}
     ],
     "story_summary": "完整故事摘要",
-    "parameters": {{
+    "parameters": {{{{
       "time": "时间",
       "place": "地点",
       "characters": "人物",
       "story_scale": "故事规模",
       "worldview": "世界观"
-    }}
-  }}
-}}
+    }}}}
+  }}}}
+}}}}
 
 【故事生成要求】
 - 如果提供了世界观，故事必须严格在该世界观的设定和背景下展开，不得出现穿越到其他世界（如回到古代、去往未来等不符合该世界观设定的情况），所有地点、设定、人物行为都必须符合该世界观。
+- 如果 generate_details 为 true，则必须为每个关键事件生成5-8个具体的子事件(sub_events)节点，详细描述该事件中的具体行为或情节。
+- 如果 generate_details 为 false，则 sub_events 数组留空即可。
 - 根据故事规模确定关键事件数量：
+  - 迷你：5个关键事件
   - 简短：10-15个关键事件
   - 中等：15-25个关键事件
   - 长篇：至少30个关键事件
@@ -697,77 +805,117 @@ def get_agent_executor():
 - 包含开端、发展、高潮、结局等完整结构
 
 【时间线提取 JSON 格式】
-如果使用 extract_timeline，请返回以下 JSON 格式（与 generate_story 保持一致）：
-{{
+如果使用 extract_timeline，请返回以下 JSON 格式（与 generate_story 完全保持一致）：
+{{{{
   "tool": "extract_timeline",
   "status": "completed",
-  "data": {{
-    "title": "故事名称",
-    "story_scale": "规模",
+  "data": {{{{
+    "title": "故事标题",
+    "story_scale": "故事规模（简短/中等/长篇）",
     "genre": "故事类型",
     "core_theme": "核心主题",
     "key_events": [
-      {{
+      {{{{
         "event_order": 1,
         "event_title": "事件标题",
-        "timestamp": "时间点",
-        "location": "发生地点",
-        "description": "事件描述",
-        "key_characters": ["涉及人物1", "涉及人物2"],
-        "significance": "事件在故事中的意义"
-      }}
+        "description": "事件详细描述",
+        "key_characters": ["人物1", "人物2"],
+        "location": "事件发生地点",
+        "significance": "事件在故事中的意义",
+        "sub_events": []
+      }}}}
     ],
     "story_summary": "完整故事摘要"
-  }}
-}}
+  }}}}
+}}}}
+
+【事件节点展开 JSON 格式】
+如果使用 expand_story_event，请返回以下 JSON 格式：
+{{{{
+  "tool": "expand_story_event",
+  "status": "completed",
+  "data": {{{{
+    "event_title": "事件标题",
+    "event_description": "原始事件描述",
+    "sub_events": [
+      {{{{
+        "sub_order": 1,
+        "title": "细节节点标题",
+        "description": "细节节点描述"
+      }}}}
+    ]
+  }}}}
+}}}}
 
 【事件生成文章 JSON 格式】
 如果使用 generate_article_from_event，请返回以下 JSON 格式：
-{{
+{{{{
   "tool": "generate_article_from_event",
   "status": "completed",
-  "data": {{
+  "data": {{{{
     "title": "文章标题",
     "event_description": "原始事件描述",
     "content": "生成的具体文章内容，可以包含多个段落，详细描写事件的发展、人物的对话和心理活动等。",
     "characters_involved": ["人物1", "人物2"],
     "word_count": "字数估算"
-  }}
-}}
+  }}}}
+}}}}
+
+【对话文案生成 JSON 格式】
+如果使用 generate_dialogue，请返回以下 JSON 格式：
+{{{{
+  "tool": "generate_dialogue",
+  "status": "completed",
+  "data": {{{{
+    "event_description": "事件描述",
+    "dialogue": "生成的具体对话内容（以对话为主，附带适当的动作和神态描写）"
+  }}}}
+}}}}
+
+【短句/分镜脚本生成 JSON 格式】
+如果使用 generate_short_script，请返回以下 JSON 格式：
+{{{{
+  "tool": "generate_short_script",
+  "status": "completed",
+  "data": {{{{
+    "event_description": "事件描述",
+    "script": "生成的短句或分镜脚本内容"
+  }}}}
+}}}}
 
 【关系网生成 JSON 格式】
 如果使用 generate_character_network，请返回以下 JSON 格式：
-{{
+{{{{
   "tool": "generate_character_network",
   "status": "completed",
-  "data": {{
+  "data": {{{{
     "worldview": "世界观名称",
     "core_characters": ["核心人物1", "核心人物2"],
     "characters": [
-      {{
+      {{{{
         "name": "新人物姓名",
-        "basic_info": {{
+        "basic_info": {{{{
           "role": "角色定位",
           "age": "年龄",
           "appearance": "外貌特征",
           "is_important": true/false
-        }},
+        }}}},
         "personality": "性格特质",
         "background": "背景故事",
         "abilities": ["能力1", "能力2"],
         "position_in_world": "在世界观中的位置",
         "relationships": [
-          {{
+          {{{{
             "target": "目标人物姓名",
             "type": "关系类型（如：朋友/敌人/师徒等）",
             "description": "关系详细描述"
-          }}
+          }}}}
         ]
-      }}
+      }}}}
     ],
     "network_summary": "关系网整体描述"
-  }}
-}}
+  }}}}
+}}}}
 
 """),
             ("human", "{input}"),
@@ -839,6 +987,7 @@ def chat_workflow():
         user_input = data.get('message', '')
         auto_save = data.get('auto_save', True)
         worldview_id = data.get('worldview_id', None)
+        scenario = data.get('scenario', '小说')
         
         if not user_input:
             return jsonify({'error': '请输入消息'}), 400
@@ -850,7 +999,7 @@ def chat_workflow():
                 try:
                     yield f"data: {json.dumps({'type': 'status', 'message': '正在分析任务意图...'}, ensure_ascii=False)}\n\n"
                     
-                    research_chain = get_research_agent_executor()
+                    research_chain = get_research_agent_executor(scenario)
                     research_result = research_chain.invoke({"input": user_input})
                     
                     # 兼容 structured_output 已经是对象的情况
@@ -868,7 +1017,7 @@ def chat_workflow():
                     if isinstance(plan, list) and len(plan) > 0:
                         yield f"data: {json.dumps({'type': 'plan', 'plan': plan}, ensure_ascii=False)}\n\n"
                         
-                        agent_executor = get_agent_executor()
+                        agent_executor = get_agent_executor(scenario)
                         results = []
                         cache_ids = []
                         
@@ -936,7 +1085,7 @@ def chat_workflow():
                     
             # Fallback for analysis or single agent
             yield f"data: {json.dumps({'type': 'status', 'message': '正在处理...'}, ensure_ascii=False)}\n\n"
-            agent_executor = get_agent_executor()
+            agent_executor = get_agent_executor(scenario)
             try:
                 result = agent_executor.invoke({"input": user_input})
                 output = result['output']
@@ -950,6 +1099,7 @@ def chat_workflow():
                 if cleaned_output.startswith("{") and not cleaned_output.endswith("}"):
                     cleaned_output += "}"
                     
+                cache_ids = []
                 if auto_save:
                     try:
                         result_json = json.loads(cleaned_output)
@@ -957,13 +1107,21 @@ def chat_workflow():
                         if isinstance(result_json, list):
                             for item in result_json:
                                 if isinstance(item, dict) and item.get('tool'):
-                                    cache_manager.save(item.get('tool'), item, worldview_id=worldview_id)
+                                    cid = cache_manager.save(item.get('tool'), item, worldview_id=worldview_id)
+                                    if cid: cache_ids.append(cid)
                         elif isinstance(result_json, dict) and result_json.get('tool'):
-                            cache_manager.save(result_json.get('tool'), result_json, worldview_id=worldview_id)
-                    except Exception:
+                            cid = cache_manager.save(result_json.get('tool'), result_json, worldview_id=worldview_id)
+                            if cid: cache_ids.append(cid)
+                    except Exception as e:
+                        print(f"[DEBUG] 自动保存失败: {e}")
                         pass
                         
-                yield f"data: {json.dumps({'type': 'end', 'content': {'success': True, 'response': output}}, ensure_ascii=False)}\n\n"
+                final_content = {'success': True, 'response': output}
+                if cache_ids:
+                    final_content['cache_ids'] = cache_ids
+                    final_content['cache_id'] = cache_ids[0]
+                    
+                yield f"data: {json.dumps({'type': 'end', 'content': final_content}, ensure_ascii=False)}\n\n"
             except Exception as e:
                 yield f"data: {json.dumps({'type': 'end', 'content': {'success': False, 'error': str(e)}}, ensure_ascii=False)}\n\n"
 

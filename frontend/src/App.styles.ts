@@ -30,6 +30,27 @@ export const styles = {
     cursor: "pointer",
     transition: "transform 0.2s ease",
   },
+  scenarioContainer: {
+    display: "flex",
+    gap: "4px",
+    background: "rgba(15, 23, 42, 0.6)",
+    padding: "4px",
+    borderRadius: "12px",
+    marginLeft: "auto",
+  },
+  scenarioBtn: (active: boolean) => ({
+    padding: "6px 16px",
+    borderRadius: "8px",
+    border: "none",
+    background: active
+      ? "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)"
+      : "transparent",
+    color: active ? "#ffffff" : "#94a3b8",
+    cursor: "pointer",
+    fontWeight: active ? "600" : "400",
+    transition: "all 0.2s ease",
+    fontSize: "13px",
+  }),
   mainPage: {
     maxWidth: "1000px",
     margin: "0 auto",

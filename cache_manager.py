@@ -63,8 +63,10 @@ class CacheManager:
             "generate_related_character": "related_character",
             "generate_character_network": "related_character",
             "generate_story": "story",
-            "extract_timeline": "timeline",
-            "generate_article_from_event": "generate_article_from_event"
+            "extract_timeline": "story",  # 将故事线分析与核心故事线合并
+            "generate_article_from_event": "generate_article_from_event",
+            "generate_dialogue": "dialogue",
+            "generate_short_script": "short_script"
         }
         return category_map.get(tool_name)
     

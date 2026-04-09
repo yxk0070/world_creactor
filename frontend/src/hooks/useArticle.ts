@@ -6,7 +6,7 @@ export function useArticle() {
   const navigate = useNavigate();
   const [eventDescription, setEventDescription] = useState("");
   const [context, setContext] = useState("");
-  const [style, setStyle] = useState("叙事");
+  const [style, setStyle] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [streamContent, setStreamContent] = useState("");
@@ -17,7 +17,7 @@ export function useArticle() {
   const [savedStories, setSavedStories] = useState<any[]>([]);
   const [selectedStoryId, setSelectedStoryId] = useState<string>("");
   const [selectedEventIndex, setSelectedEventIndex] = useState<number | null>(
-    null,
+    null
   );
 
   useEffect(() => {
@@ -83,11 +83,12 @@ export function useArticle() {
     });
 
     try {
+      const actualStyle = style.trim() ? style : "叙事";
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          message: `根据事件生成文章。事件描述：${eventDescription}。上下文：${context}。风格：${style}`,
+          message: `根据事件生成文章。事件描述：${eventDescription}。上下文：${context}。风格：${actualStyle}`,
           auto_save: true,
         }),
       });

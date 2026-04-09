@@ -103,7 +103,7 @@ export function ArticlePage() {
                   >
                     👤 {char}
                   </span>
-                ),
+                )
               )}
             {articleData.word_count && (
               <span
@@ -217,7 +217,7 @@ export function ArticlePage() {
                 >
                   {(() => {
                     const story = savedStories.find(
-                      (s) => s.id === selectedStoryId,
+                      (s) => s.id === selectedStoryId
                     );
                     if (!story || !story.data) return null;
 
@@ -349,6 +349,21 @@ export function ArticlePage() {
                 <option value="史诗">史诗（宏大叙事，带有历史厚重感）</option>
                 <option value="武侠">武侠（江湖风气，动作描写细腻）</option>
                 <option value="悬疑">悬疑（扣人心弦，气氛压抑）</option>
+                <option value="二次元">
+                  二次元（轻小说风格，心理描写丰富，颜文字/内心吐槽）
+                </option>
+                <option value="古典小说">
+                  古典小说（半文半白，章回体风格，用词古风）
+                </option>
+                <option value="书面报告">
+                  书面报告（公文体，客观、严谨、条理清晰）
+                </option>
+                <option value="翻译腔">
+                  翻译腔（类似译制片，句子冗长，定语后置，"哦，我的老天"）
+                </option>
+                <option value="评书">
+                  评书（说书人口吻，"且听下回分解"，节奏明快）
+                </option>
               </datalist>
             </label>
 

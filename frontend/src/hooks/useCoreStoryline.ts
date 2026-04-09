@@ -33,10 +33,11 @@ export function useCoreStoryline() {
   const [worldviewName, setWorldviewName] = useState("");
   const [worldviews, setWorldviews] = useState<Worldview[]>([]);
   const [selectedCharacterIds, setSelectedCharacterIds] = useState<string[]>(
-    [],
+    []
   );
   const [allCharacters, setAllCharacters] = useState<Character[]>([]);
   const [storyScale, setStoryScale] = useState("中等");
+  const [generateDetails, setGenerateDetails] = useState(false);
   const [selectedNetwork, setSelectedNetwork] = useState("");
   const [networks, setNetworks] = useState<Network[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -49,7 +50,7 @@ export function useCoreStoryline() {
   const filteredCharacters = selectedWorldview
     ? allCharacters.filter((char) => {
         const selectedWorldviewObj = worldviews.find(
-          (w) => w.id === selectedWorldview,
+          (w) => w.id === selectedWorldview
         );
         if (!selectedWorldviewObj) return false;
         const worldName =
@@ -92,7 +93,7 @@ export function useCoreStoryline() {
     if (selectedWorldview) {
       setSelectedCharacterIds((prev) => {
         const selectedWorldviewObj = worldviews.find(
-          (w) => w.id === selectedWorldview,
+          (w) => w.id === selectedWorldview
         );
         if (!selectedWorldviewObj) return [];
         const worldName =
@@ -289,24 +290,78 @@ export function useCoreStoryline() {
         .join("；\n");
       if (charDetails) prompt += `\n【核心人物信息】\n${charDetails}`;
 
-      prompt += `\n【要求】故事规模=${storyScale}`;
+      prompt += `\n【要求】故事规模=${storyScale}，是否同时生成故事细节=${generateDetails}`;
 
-      const response = await fetch("/api/chat", {
+      const response = await fetch("/api/chat/workflow", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           message: prompt,
-          worldview_id: selectedWorldview || undefined,
+          auto_save: true,
+          scenario: "小说", // 默认用小说场景来生成丰富的故事线
         }),
       });
 
-      const data = await response.json();
-      if (data.success) {
+      if (!response.body) throw new Error("No response body");
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder("utf-8");
+      let finalData = null;
+      let buffer = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n\n");
+
+        // 留着最后一个可能不完整的块
+        buffer = lines.pop() || "";
+
+        for (const line of lines) {
+          if (line.trim().startsWith("data: ")) {
+            try {
+              const data = JSON.parse(line.trim().substring(6));
+              if (data.type === "status") {
+                setStreamContent(data.message);
+              } else if (data.type === "end") {
+                finalData = data.content;
+              } else if (data.type === "error") {
+                throw new Error(data.message);
+              }
+            } catch (e) {
+              console.warn("Parse error for line:", line, e);
+            }
+          }
+        }
+      }
+
+      if (finalData && finalData.success) {
         setStreamContent("生成完成！");
-        setResult(data);
+        try {
+          const parsedData = JSON.parse(finalData.response);
+          // results 是个数组，取第一项，也就是 generate_story 的结果
+          let finalResult = Array.isArray(parsedData)
+            ? parsedData[0]
+            : parsedData;
+          if (finalData.cache_id) {
+            finalResult.cache_id = finalData.cache_id;
+          } else if (finalData.cache_ids && finalData.cache_ids.length > 0) {
+            finalResult.cache_id = finalData.cache_ids[0];
+          }
+          setResult(finalResult);
+        } catch (e) {
+          let finalFallback = finalData.data || finalData;
+          if (finalData.cache_id) {
+            finalFallback.cache_id = finalData.cache_id;
+          } else if (finalData.cache_ids && finalData.cache_ids.length > 0) {
+            finalFallback.cache_id = finalData.cache_ids[0];
+          }
+          setResult(finalFallback);
+        }
         updateTask(taskId, { status: "completed", message: "故事线生成完成" });
       } else {
-        const errorMsg = data.error || "未知错误";
+        const errorMsg = finalData?.error || "未知错误";
         setStreamContent("生成失败：" + errorMsg);
         updateTask(taskId, {
           status: "error",
@@ -336,6 +391,8 @@ export function useCoreStoryline() {
     allCharacters,
     storyScale,
     setStoryScale,
+    generateDetails,
+    setGenerateDetails,
     isLoading,
     result,
     setResult,

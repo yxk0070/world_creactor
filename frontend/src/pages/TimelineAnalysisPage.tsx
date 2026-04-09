@@ -71,7 +71,10 @@ export function TimelineAnalysisPage() {
         data={{
           title: timelineData.title || "故事线分析",
           core_theme: timelineData.core_theme || "时间线提取",
+          story_scale: timelineData.story_scale,
+          genre: timelineData.genre,
           key_events: events,
+          id: data.cache_id || timelineData.id || timelineData.cache_id,
         }}
       />
     );

@@ -4,6 +4,8 @@ import { WorldviewRenderer } from "../components/WorldviewRenderer";
 import { CharacterRenderer } from "../components/CharacterRenderer";
 import { CharacterNetworkRenderer } from "../components/CharacterNetworkRenderer";
 import { ArticleRenderer } from "../components/ArticleRenderer";
+import { DialogueRenderer } from "../components/DialogueRenderer";
+import { ShortScriptRenderer } from "../components/ShortScriptRenderer";
 import { EditableResult } from "../components/EditableResult";
 import { useCache } from "../hooks/useCache";
 
@@ -409,9 +411,15 @@ export function CachePage() {
                 {(() => {
                   try {
                     const data = selectedItem.data?.data || selectedItem.data;
+
+                    // 把外部的 id 注入到 data 里，方便里面组件(如 StorylineRenderer)更新缓存
+                    if (data && typeof data === "object") {
+                      data.cache_id = selectedItem.id;
+                    }
+
                     console.log(
                       "CachePage -> 尝试渲染的原始数据:",
-                      selectedItem.data,
+                      selectedItem.data
                     );
                     console.log("CachePage -> 剥离一层的 data:", data);
 
@@ -442,6 +450,12 @@ export function CachePage() {
                       // 人物关系网 (generate_character_network)
                       console.log("CachePage -> 判定为: 人物关系网");
                       return <CharacterNetworkRenderer data={data} />;
+                    } else if (data && (data.dialogue || data.data?.dialogue)) {
+                      console.log("CachePage -> 判定为: 对话文案");
+                      return <DialogueRenderer data={data} />;
+                    } else if (data && (data.script || data.data?.script)) {
+                      console.log("CachePage -> 判定为: 短句脚本");
+                      return <ShortScriptRenderer data={data} />;
                     } else if (
                       data &&
                       (data.content ||
