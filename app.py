@@ -547,9 +547,8 @@ JSON 格式示例：
         ("user", "{input}")
     ])
     
-    # 使用 with_structured_output 强制要求大模型返回我们定义的 JSON 结构
-    structured_llm = llm.with_structured_output(TaskPlan)
-    chain = prompt | structured_llm
+    # 去掉 with_structured_output，以便我们可以流式解析
+    chain = prompt | llm
     return chain
 
 def get_agent_executor(scenario: str = "小说"):
@@ -997,36 +996,92 @@ def chat_workflow():
             
             if not is_analysis_request:
                 try:
-                    yield f"data: {json.dumps({'type': 'status', 'message': '正在分析任务意图...'}, ensure_ascii=False)}\n\n"
+                    import threading
+                    import queue
+                    
+                    yield f"data: {json.dumps({'type': 'status', 'message': '正在流式下发任务...'}, ensure_ascii=False)}\n\n"
                     
                     research_chain = get_research_agent_executor(scenario)
-                    research_result = research_chain.invoke({"input": user_input})
                     
-                    # 兼容 structured_output 已经是对象的情况
-                    if hasattr(research_result, 'plan'):
-                        plan = [step.dict() for step in research_result.plan]
-                    else:
-                        research_output = research_result.content if hasattr(research_result, 'content') else str(research_result)
-                        cleaned_research_output = research_output.strip()
-                        if cleaned_research_output.startswith("```json"): cleaned_research_output = cleaned_research_output[7:]
-                        elif cleaned_research_output.startswith("```"): cleaned_research_output = cleaned_research_output[3:]
-                        if cleaned_research_output.endswith("```"): cleaned_research_output = cleaned_research_output[:-3]
-                        cleaned_research_output = cleaned_research_output.strip()
-                        plan = json.loads(cleaned_research_output)
+                    q = queue.Queue()
                     
-                    if isinstance(plan, list) and len(plan) > 0:
-                        yield f"data: {json.dumps({'type': 'plan', 'plan': plan}, ensure_ascii=False)}\n\n"
-                        
-                        agent_executor = get_agent_executor(scenario)
-                        results = []
-                        cache_ids = []
-                        
-                        for i, step in enumerate(plan):
-                            tool_name = step.get('tool')
-                            description = step.get('description', '')
-                            params = step.get('parameters', {})
+                    def run_research():
+                        try:
+                            # 🚀 优化：意图直通车 (Fast Track)
+                            # 如果前端发送的指令里已经明确指定了使用的工具，直接跳过大模型的沉重分析！
+                            import re
+                            explicit_tool_match = re.search(r'使用\s+([a-zA-Z_]+)\s+工具', user_input)
+                            if explicit_tool_match:
+                                tool_name = explicit_tool_match.group(1)
+                                print(f"[DEBUG] 🚀 意图直通车触发！跳过分析，直接分配工具: {tool_name}")
+                                q.put(("step", {
+                                    "step": 1,
+                                    "tool": tool_name,
+                                    "description": f"执行特定生成任务 ({tool_name})",
+                                    "parameters": {}
+                                }))
+                                q.put(("done", None))
+                                return
+
+                            buffer = ""
+                            seen_steps = set()
+                            # 开启流式预测
+                            for chunk in research_chain.stream({"input": user_input}):
+                                buffer += chunk.content
+                                
+                                # 基于花括号计数，提取完整的 JSON 对象
+                                start = -1
+                                depth = 0
+                                for i, char in enumerate(buffer):
+                                    if char == '{':
+                                        if depth == 0:
+                                            start = i
+                                        depth += 1
+                                    elif char == '}':
+                                        depth -= 1
+                                        if depth == 0 and start != -1:
+                                            obj_str = buffer[start:i+1]
+                                            try:
+                                                obj = json.loads(obj_str)
+                                                step_num = obj.get("step")
+                                                # 如果是合法的步骤，且还没处理过
+                                                if step_num and "tool" in obj and step_num not in seen_steps:
+                                                    seen_steps.add(step_num)
+                                                    q.put(("step", obj))
+                                            except Exception:
+                                                pass
+                                            start = -1
+                            q.put(("done", None))
+                        except Exception as e:
+                            q.put(("error", str(e)))
+
+                    threading.Thread(target=run_research, daemon=True).start()
+                    
+                    plan = []
+                    agent_executor = get_agent_executor(scenario)
+                    results = []
+                    cache_ids = []
+                    
+                    while True:
+                        msg_type, data = q.get()
+                        if msg_type == "error":
+                            yield f"data: {json.dumps({'type': 'error', 'message': f'分析任务失败: {data}'}, ensure_ascii=False)}\n\n"
+                            break
+                        elif msg_type == "done":
+                            if not plan:
+                                yield f"data: {json.dumps({'type': 'error', 'message': '未能解析出任何任务步骤'}, ensure_ascii=False)}\n\n"
+                            break
+                        elif msg_type == "step":
+                            plan.append(data)
+                            # 实时下发新的任务流，前端会动态更新进度条
+                            yield f"data: {json.dumps({'type': 'plan', 'plan': plan}, ensure_ascii=False)}\n\n"
                             
-                            yield f"data: {json.dumps({'type': 'step_start', 'step': i, 'message': f'执行中: {description}'}, ensure_ascii=False)}\n\n"
+                            step_index = len(plan) - 1
+                            tool_name = data.get('tool')
+                            description = data.get('description', '')
+                            params = data.get('parameters', {})
+                            
+                            yield f"data: {json.dumps({'type': 'step_start', 'step': step_index, 'message': f'执行中: {description}'}, ensure_ascii=False)}\n\n"
                             
                             step_input = f"请使用 {tool_name} 工具，完成以下任务：{description}。\n"
                             if params:
@@ -1047,37 +1102,50 @@ def chat_workflow():
                                     results.append(parsed_out)
                                     
                                     if auto_save:
-                                        cid = cache_manager.save(tool_name, parsed_out, worldview_id=worldview_id)
-                                        cache_ids.append(cid)
-                                        
-                                        if tool_name == "generate_character_network":
-                                            try:
-                                                network_data = parsed_out.get("data", {})
-                                                characters_list = network_data.get("characters", [])
-                                                if characters_list:
-                                                    for new_char in characters_list:
-                                                        single_char_data = {
-                                                            "tool": "generate_related_character",
-                                                            "status": "completed",
-                                                            "data": new_char
-                                                        }
-                                                        cache_manager.save("generate_related_character", single_char_data, worldview_id=worldview_id)
-                                            except Exception as parse_e:
-                                                pass
-                                    yield f"data: {json.dumps({'type': 'step_end', 'step': i, 'result': parsed_out}, ensure_ascii=False)}\n\n"
+                                        try:
+                                            if isinstance(parsed_out, list):
+                                                for item in parsed_out:
+                                                    if isinstance(item, dict) and item.get('tool'):
+                                                        cid = cache_manager.save(item.get('tool'), item, worldview_id=worldview_id)
+                                                        if cid: cache_ids.append(cid)
+                                            elif isinstance(parsed_out, dict) and parsed_out.get('tool'):
+                                                cid = cache_manager.save(parsed_out.get('tool'), parsed_out, worldview_id=worldview_id)
+                                                if cid: cache_ids.append(cid)
+                                                
+                                                if parsed_out.get('tool') == "generate_character_network":
+                                                    try:
+                                                        network_data = parsed_out.get("data", {})
+                                                        characters_list = network_data.get("characters", [])
+                                                        if characters_list:
+                                                            for new_char in characters_list:
+                                                                single_char_data = {
+                                                                    "tool": "generate_related_character",
+                                                                    "status": "completed",
+                                                                    "data": new_char
+                                                                }
+                                                                cache_manager.save("generate_related_character", single_char_data, worldview_id=worldview_id)
+                                                    except Exception:
+                                                        pass
+                                        except Exception:
+                                            pass
+                                            
+                                    yield f"data: {json.dumps({'type': 'step_end', 'step': step_index, 'result': parsed_out}, ensure_ascii=False)}\n\n"
                                 except json.JSONDecodeError:
                                     results.append({"tool": tool_name, "status": "completed", "data": step_output})
-                                    yield f"data: {json.dumps({'type': 'step_end', 'step': i, 'result': {'tool': tool_name, 'status': 'completed', 'data': step_output}}, ensure_ascii=False)}\n\n"
+                                    yield f"data: {json.dumps({'type': 'step_end', 'step': step_index, 'result': {'tool': tool_name, 'status': 'completed', 'data': step_output}}, ensure_ascii=False)}\n\n"
                                     
                             except Exception as e:
                                 results.append({"tool": tool_name, "status": "failed", "error": str(e)})
-                                yield f"data: {json.dumps({'type': 'step_end', 'step': i, 'result': {'status': 'failed', 'error': str(e)}}, ensure_ascii=False)}\n\n"
-                        
+                                yield f"data: {json.dumps({'type': 'step_end', 'step': step_index, 'result': {'status': 'failed', 'error': str(e)}}, ensure_ascii=False)}\n\n"
+                    
+                    if plan:
                         final_res = {
                             'success': True,
                             'response': json.dumps(results, ensure_ascii=False),
                             'cache_ids': cache_ids
                         }
+                        if cache_ids:
+                            final_res['cache_id'] = cache_ids[0]
                         yield f"data: {json.dumps({'type': 'end', 'content': final_res}, ensure_ascii=False)}\n\n"
                         return
                 except Exception as e:

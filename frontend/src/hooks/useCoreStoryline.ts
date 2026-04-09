@@ -291,6 +291,7 @@ export function useCoreStoryline() {
       if (charDetails) prompt += `\n【核心人物信息】\n${charDetails}`;
 
       prompt += `\n【要求】故事规模=${storyScale}，是否同时生成故事细节=${generateDetails}`;
+      prompt += `\n请使用 generate_story 工具`;
 
       const response = await fetch("/api/chat/workflow", {
         method: "POST",
