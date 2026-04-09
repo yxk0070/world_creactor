@@ -444,8 +444,9 @@ export function CachePage() {
                       return <CharacterRenderer data={selectedItem.data} />;
                     } else if (
                       data &&
-                      data.characters &&
-                      data.network_summary
+                      ((data.characters && Array.isArray(data.characters)) ||
+                        (data.data?.characters &&
+                          Array.isArray(data.data?.characters)))
                     ) {
                       // 人物关系网 (generate_character_network)
                       console.log("CachePage -> 判定为: 人物关系网");

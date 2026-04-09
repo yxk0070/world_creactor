@@ -12,15 +12,19 @@ export function CharacterRenderer({ data }: CharacterRendererProps) {
 
   let characterData = data;
 
-  if (data.success && data.response) {
+  if (characterData.success && characterData.response) {
     try {
-      const parsedResponse = JSON.parse(data.response);
+      const parsedResponse = JSON.parse(characterData.response);
       console.log("解析后的response:", parsedResponse);
       characterData = parsedResponse;
     } catch (e) {
       console.log("解析response失败:", e);
-      characterData = data.response;
+      characterData = characterData.response;
     }
+  }
+
+  if (Array.isArray(characterData) && characterData.length > 0) {
+    characterData = characterData[0];
   }
 
   if (characterData.data) {

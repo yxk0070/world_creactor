@@ -1,8 +1,13 @@
 import { JsonRenderer } from "./JsonRenderer";
 
 export function CharacterNetworkRenderer({ data }: { data: any }) {
-  const characters = data?.characters || [];
-  const summary = data?.network_summary;
+  let networkData = data;
+  if (data?.data && data.data.characters) {
+    networkData = data.data;
+  }
+
+  const characters = networkData?.characters || [];
+  const summary = networkData?.network_summary;
 
   if (!characters.length) {
     return <JsonRenderer data={data} />;

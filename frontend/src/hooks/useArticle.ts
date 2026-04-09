@@ -97,7 +97,29 @@ export function useArticle() {
       console.log("API返回的完整数据:", data);
       if (data.success) {
         setStreamContent("生成完成！");
-        setResult(data);
+        
+        let finalResult = data;
+        try {
+          if (data.response) {
+            const parsedData = JSON.parse(data.response);
+            if (Array.isArray(parsedData) && parsedData.length > 0) {
+              finalResult = parsedData[0];
+            } else if (parsedData && typeof parsedData === 'object') {
+              finalResult = parsedData;
+            }
+          }
+          
+          if (data.cache_id) {
+             finalResult.cache_id = data.cache_id;
+          } else if (data.cache_ids && data.cache_ids.length > 0) {
+             finalResult.cache_id = data.cache_ids[0];
+          }
+        } catch (e) {
+          console.warn("Article parse response fallback:", e);
+          if (data.cache_id) finalResult.cache_id = data.cache_id;
+        }
+
+        setResult(finalResult);
         updateTask(taskId, { status: "completed", message: "文章生成完成" });
       } else {
         const errorMsg = data.error || "未知错误";

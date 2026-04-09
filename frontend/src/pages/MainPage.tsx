@@ -78,7 +78,11 @@ function ToolCardRenderer({ item }: { item: any }) {
     !targetData.content
   ) {
     return <CharacterRenderer data={{ data: targetData }} />;
-  } else if (targetData && targetData.characters && targetData.relationships) {
+  } else if (
+    targetData &&
+    (targetData.characters || targetData.data?.characters) &&
+    (targetData.network_summary || targetData.data?.network_summary)
+  ) {
     return <CharacterNetworkRenderer data={targetData} />;
   } else if (targetData && (targetData.dialogue || targetData.data?.dialogue)) {
     return <DialogueRenderer data={{ data: targetData }} />;

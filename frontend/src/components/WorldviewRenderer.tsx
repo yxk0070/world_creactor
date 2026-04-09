@@ -12,15 +12,19 @@ export function WorldviewRenderer({ data }: WorldviewRendererProps) {
 
   let worldviewData = data;
 
-  if (data.success && data.response) {
+  if (worldviewData.success && worldviewData.response) {
     try {
-      const parsedResponse = JSON.parse(data.response);
+      const parsedResponse = JSON.parse(worldviewData.response);
       console.log("解析后的response:", parsedResponse);
       worldviewData = parsedResponse;
     } catch (e) {
       console.log("解析response失败:", e);
-      worldviewData = data.response;
+      worldviewData = worldviewData.response;
     }
+  }
+  
+  if (Array.isArray(worldviewData) && worldviewData.length > 0) {
+    worldviewData = worldviewData[0];
   }
 
   if (worldviewData.data) {
