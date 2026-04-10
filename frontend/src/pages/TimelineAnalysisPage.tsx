@@ -42,16 +42,16 @@ export function TimelineAnalysisPage() {
       return (
         <div style={{ padding: "16px" }}>
           <p
-            style={{ color: "#94a3b8", fontSize: "14px", marginBottom: "16px" }}
+            style={{ color: "var(--text-muted)", fontSize: "14px", marginBottom: "16px" }}
           >
             以下是分析结果的完整内容：
           </p>
           <pre
             style={{
-              background: "rgba(15, 23, 42, 0.8)",
+              background: "var(--bg-glass-80)",
               padding: "16px",
               borderRadius: "8px",
-              color: "#cbd5e1",
+              color: "var(--text-tertiary)",
               fontSize: "12px",
               lineHeight: "1.6",
               overflowX: "auto",
@@ -113,7 +113,7 @@ export function TimelineAnalysisPage() {
               <span
                 style={{
                   fontSize: "12px",
-                  color: article.length > 3800 ? "#ef4444" : "#94a3b8",
+                  color: article.length > 3800 ? "#ef4444" : "var(--text-muted)",
                 }}
               >
                 {article.length} / 4000 字
@@ -173,7 +173,7 @@ export function TimelineAnalysisPage() {
                 <div style={{ padding: "16px" }}>
                   <p
                     style={{
-                      color: "#94a3b8",
+                      color: "var(--text-muted)",
                       fontSize: "14px",
                       marginBottom: "16px",
                     }}
@@ -182,10 +182,10 @@ export function TimelineAnalysisPage() {
                   </p>
                   <pre
                     style={{
-                      background: "rgba(15, 23, 42, 0.8)",
+                      background: "var(--bg-glass-80)",
                       padding: "16px",
                       borderRadius: "8px",
-                      color: "#cbd5e1",
+                      color: "var(--text-tertiary)",
                       fontSize: "12px",
                       lineHeight: "1.6",
                       overflowX: "auto",

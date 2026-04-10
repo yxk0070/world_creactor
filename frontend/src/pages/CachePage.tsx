@@ -44,8 +44,8 @@ export function CachePage() {
       <div style={{ flex: "0 0 400px" }}>
         <div
           style={{
-            background: "rgba(30, 41, 59, 0.85)",
-            border: "1px solid rgba(71, 85, 105, 0.5)",
+            background: "var(--bg-solid-card-85)",
+            border: "1px solid var(--border-dark)",
             borderRadius: "20px",
             padding: "24px",
             marginBottom: "20px",
@@ -56,7 +56,7 @@ export function CachePage() {
               fontSize: "24px",
               fontWeight: "700",
               marginBottom: "20px",
-              color: "#f8fafc",
+              color: "var(--text-primary)",
             }}
           >
             📦 历史记录
@@ -79,10 +79,10 @@ export function CachePage() {
                 style={{
                   flex: 1,
                   padding: "10px 14px",
-                  border: "2px solid rgba(71, 85, 105, 0.5)",
+                  border: "2px solid var(--border-dark)",
                   borderRadius: "10px",
-                  background: "rgba(15, 23, 42, 0.8)",
-                  color: "#f8fafc",
+                  background: "var(--bg-glass-80)",
+                  color: "var(--text-primary)",
                   fontSize: "14px",
                 }}
               />
@@ -91,7 +91,7 @@ export function CachePage() {
                 style={{
                   padding: "10px 20px",
                   background:
-                    "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
+                    "linear-gradient(135deg, var(--accent-primary) 0%, #8b5cf6 100%)",
                   color: "white",
                   border: "none",
                   borderRadius: "10px",
@@ -111,9 +111,9 @@ export function CachePage() {
                 style={{
                   width: "100%",
                   padding: "8px 16px",
-                  background: "rgba(71, 85, 105, 0.8)",
-                  color: "#f8fafc",
-                  border: "1px solid rgba(71, 85, 105, 0.5)",
+                  background: "var(--border-dark-80)",
+                  color: "var(--text-primary)",
+                  border: "1px solid var(--border-dark)",
                   borderRadius: "8px",
                   cursor: "pointer",
                   fontSize: "13px",
@@ -129,7 +129,7 @@ export function CachePage() {
               style={{
                 display: "block",
                 marginBottom: "8px",
-                color: "#cbd5e1",
+                color: "var(--text-tertiary)",
                 fontWeight: "500",
               }}
             >
@@ -141,10 +141,10 @@ export function CachePage() {
               style={{
                 width: "100%",
                 padding: "10px 14px",
-                border: "2px solid rgba(71, 85, 105, 0.5)",
+                border: "2px solid var(--border-dark)",
                 borderRadius: "10px",
-                background: "rgba(15, 23, 42, 0.8)",
-                color: "#f8fafc",
+                background: "var(--bg-glass-80)",
+                color: "var(--text-primary)",
                 fontSize: "14px",
               }}
             >
@@ -201,8 +201,8 @@ export function CachePage() {
 
         <div
           style={{
-            background: "rgba(30, 41, 59, 0.85)",
-            border: "1px solid rgba(71, 85, 105, 0.5)",
+            background: "var(--bg-solid-card-85)",
+            border: "1px solid var(--border-dark)",
             borderRadius: "20px",
             padding: "24px",
             maxHeight: "calc(100vh - 350px)",
@@ -211,7 +211,7 @@ export function CachePage() {
         >
           {isLoading ? (
             <div
-              style={{ textAlign: "center", color: "#94a3b8", padding: "40px" }}
+              style={{ textAlign: "center", color: "var(--text-muted)", padding: "40px" }}
             >
               加载中...
             </div>
@@ -234,7 +234,7 @@ export function CachePage() {
                       style={{
                         fontSize: "15px",
                         fontWeight: "600",
-                        color: "#cbd5e1",
+                        color: "var(--text-tertiary)",
                         margin: 0,
                       }}
                     >
@@ -265,12 +265,12 @@ export function CachePage() {
                         marginBottom: "8px",
                         background:
                           selectedItem?.id === item.id
-                            ? "rgba(99, 102, 241, 0.2)"
-                            : "rgba(15, 23, 42, 0.6)",
+                            ? "var(--accent-bg)"
+                            : "var(--bg-glass)",
                         border:
                           selectedItem?.id === item.id
-                            ? "1px solid rgba(99, 102, 241, 0.5)"
-                            : "1px solid rgba(71, 85, 105, 0.3)",
+                            ? "1px solid var(--accent-bg-50)"
+                            : "1px solid var(--border-light)",
                         borderRadius: "10px",
                         cursor: "pointer",
                         transition: "all 0.2s ease",
@@ -278,13 +278,13 @@ export function CachePage() {
                       onMouseEnter={(e) => {
                         if (selectedItem?.id !== item.id) {
                           e.currentTarget.style.background =
-                            "rgba(71, 85, 105, 0.4)";
+                            "var(--border-light)";
                         }
                       }}
                       onMouseLeave={(e) => {
                         if (selectedItem?.id !== item.id) {
                           e.currentTarget.style.background =
-                            "rgba(15, 23, 42, 0.6)";
+                            "var(--bg-glass)";
                         }
                       }}
                     >
@@ -292,7 +292,7 @@ export function CachePage() {
                         style={{
                           fontSize: "14px",
                           fontWeight: "500",
-                          color: "#f8fafc",
+                          color: "var(--text-primary)",
                           marginBottom: "4px",
                           overflow: "hidden",
                           textOverflow: "ellipsis",
@@ -304,7 +304,7 @@ export function CachePage() {
                       <div
                         style={{
                           fontSize: "12px",
-                          color: "#94a3b8",
+                          color: "var(--text-muted)",
                         }}
                       >
                         {formatDate(item.created_at)}
@@ -321,7 +321,7 @@ export function CachePage() {
               <div
                 style={{
                   textAlign: "center",
-                  color: "#94a3b8",
+                  color: "var(--text-muted)",
                   padding: "40px",
                 }}
               >
@@ -335,8 +335,8 @@ export function CachePage() {
         {selectedItem ? (
           <div
             style={{
-              background: "rgba(30, 41, 59, 0.85)",
-              border: "1px solid rgba(71, 85, 105, 0.5)",
+              background: "var(--bg-solid-card-85)",
+              border: "1px solid var(--border-dark)",
               borderRadius: "20px",
               padding: "32px",
             }}
@@ -355,12 +355,12 @@ export function CachePage() {
                     fontSize: "22px",
                     fontWeight: "700",
                     marginBottom: "8px",
-                    color: "#f8fafc",
+                    color: "var(--text-primary)",
                   }}
                 >
                   {selectedItem.name}
                 </h2>
-                <div style={{ color: "#94a3b8", fontSize: "14px" }}>
+                <div style={{ color: "var(--text-muted)", fontSize: "14px" }}>
                   创建于: {formatDate(selectedItem.created_at)}
                   {selectedItem.updated_at !== selectedItem.created_at && (
                     <span>
@@ -402,10 +402,10 @@ export function CachePage() {
             >
               <div
                 style={{
-                  background: "rgba(15, 23, 42, 0.6)",
+                  background: "var(--bg-glass)",
                   borderRadius: "12px",
                   padding: "24px",
-                  color: "#cbd5e1",
+                  color: "var(--text-tertiary)",
                 }}
               >
                 {(() => {
@@ -495,8 +495,8 @@ export function CachePage() {
         ) : (
           <div
             style={{
-              background: "rgba(30, 41, 59, 0.85)",
-              border: "1px solid rgba(71, 85, 105, 0.5)",
+              background: "var(--bg-solid-card-85)",
+              border: "1px solid var(--border-dark)",
               borderRadius: "20px",
               padding: "80px 32px",
               textAlign: "center",
@@ -508,12 +508,12 @@ export function CachePage() {
                 fontSize: "24px",
                 fontWeight: "600",
                 marginBottom: "12px",
-                color: "#cbd5e1",
+                color: "var(--text-tertiary)",
               }}
             >
               选择一个历史记录项查看详情
             </h2>
-            <p style={{ color: "#94a3b8", fontSize: "15px" }}>
+            <p style={{ color: "var(--text-muted)", fontSize: "15px" }}>
               在左侧列表中点击任意历史记录项来查看详细内容
             </p>
           </div>

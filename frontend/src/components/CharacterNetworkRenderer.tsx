@@ -18,16 +18,16 @@ export function CharacterNetworkRenderer({ data }: { data: any }) {
       {summary && (
         <div
           style={{
-            background: "rgba(15, 23, 42, 0.6)",
+            background: "var(--bg-glass)",
             padding: "16px",
             borderRadius: "12px",
-            borderLeft: "4px solid #6366f1",
+            borderLeft: "4px solid var(--accent-primary)",
           }}
         >
           <h4
             style={{
               margin: "0 0 8px 0",
-              color: "#e2e8f0",
+              color: "var(--text-secondary)",
               fontSize: "16px",
             }}
           >
@@ -36,7 +36,7 @@ export function CharacterNetworkRenderer({ data }: { data: any }) {
           <p
             style={{
               margin: 0,
-              color: "#94a3b8",
+              color: "var(--text-muted)",
               fontSize: "14px",
               lineHeight: "1.6",
             }}
@@ -57,10 +57,10 @@ export function CharacterNetworkRenderer({ data }: { data: any }) {
           <div
             key={index}
             style={{
-              background: "rgba(30, 41, 59, 0.8)",
+              background: "var(--bg-card-80)",
               borderRadius: "12px",
               padding: "20px",
-              border: "1px solid rgba(71, 85, 105, 0.5)",
+              border: "1px solid var(--border-dark)",
             }}
           >
             <div
@@ -71,12 +71,12 @@ export function CharacterNetworkRenderer({ data }: { data: any }) {
                 marginBottom: "12px",
               }}
             >
-              <h4 style={{ margin: 0, color: "#f8fafc", fontSize: "18px" }}>
+              <h4 style={{ margin: 0, color: "var(--text-primary)", fontSize: "18px" }}>
                 {char.name}
               </h4>
               <span
                 style={{
-                  background: "rgba(99, 102, 241, 0.2)",
+                  background: "var(--accent-bg)",
                   color: "#a5b4fc",
                   padding: "4px 10px",
                   borderRadius: "6px",
@@ -89,7 +89,7 @@ export function CharacterNetworkRenderer({ data }: { data: any }) {
 
             <p
               style={{
-                color: "#cbd5e1",
+                color: "var(--text-tertiary)",
                 fontSize: "14px",
                 marginBottom: "16px",
                 lineHeight: "1.5",
@@ -103,7 +103,7 @@ export function CharacterNetworkRenderer({ data }: { data: any }) {
                 <h5
                   style={{
                     margin: "0 0 8px 0",
-                    color: "#94a3b8",
+                    color: "var(--text-muted)",
                     fontSize: "14px",
                   }}
                 >
@@ -120,23 +120,23 @@ export function CharacterNetworkRenderer({ data }: { data: any }) {
                     <div
                       key={idx}
                       style={{
-                        background: "rgba(15, 23, 42, 0.6)",
+                        background: "var(--bg-glass)",
                         padding: "10px",
                         borderRadius: "8px",
                         fontSize: "13px",
                       }}
                     >
-                      <div style={{ color: "#f8fafc", marginBottom: "4px" }}>
+                      <div style={{ color: "var(--text-primary)", marginBottom: "4px" }}>
                         与{" "}
                         <span style={{ color: "#38bdf8", fontWeight: "bold" }}>
                           {rel.target}
                         </span>
-                        <span style={{ margin: "0 8px", color: "#94a3b8" }}>
+                        <span style={{ margin: "0 8px", color: "var(--text-muted)" }}>
                           -
                         </span>
                         <span style={{ color: "#10b981" }}>{rel.type}</span>
                       </div>
-                      <div style={{ color: "#94a3b8" }}>{rel.description}</div>
+                      <div style={{ color: "var(--text-muted)" }}>{rel.description}</div>
                     </div>
                   ))}
                 </div>

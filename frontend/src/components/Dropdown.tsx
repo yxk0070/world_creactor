@@ -41,8 +41,8 @@ export function Dropdown({ label, items, activePath }: DropdownProps) {
         style={{
           padding: "12px 24px",
           background:
-            isActive || isOpen ? "rgba(99, 102, 241, 0.3)" : "transparent",
-          color: isActive || isOpen ? "#f8fafc" : "#94a3b8",
+            isActive || isOpen ? "var(--accent-bg-hover)" : "transparent",
+          color: isActive || isOpen ? "var(--text-primary)" : "var(--text-muted)",
           border: "none",
           borderRadius: "12px",
           fontWeight: isActive || isOpen ? "600" : "500",
@@ -55,14 +55,14 @@ export function Dropdown({ label, items, activePath }: DropdownProps) {
         }}
         onMouseEnter={(e) => {
           if (!isActive && !isOpen) {
-            e.currentTarget.style.background = "rgba(71, 85, 105, 0.3)";
-            e.currentTarget.style.color = "#f8fafc";
+            e.currentTarget.style.background = "var(--border-light)";
+            e.currentTarget.style.color = "var(--text-primary)";
           }
         }}
         onMouseLeave={(e) => {
           if (!isActive && !isOpen) {
             e.currentTarget.style.background = "transparent";
-            e.currentTarget.style.color = "#94a3b8";
+            e.currentTarget.style.color = "var(--text-muted)";
           }
         }}
       >
@@ -84,9 +84,9 @@ export function Dropdown({ label, items, activePath }: DropdownProps) {
             top: "100%",
             left: "0",
             marginTop: "8px",
-            background: "rgba(30, 41, 59, 0.98)",
+            background: "var(--bg-solid-card-85)",
             backdropFilter: "blur(12px)",
-            border: "1px solid rgba(71, 85, 105, 0.5)",
+            border: "1px solid var(--border-dark)",
             borderRadius: "12px",
             padding: "8px",
             minWidth: "180px",
@@ -102,7 +102,7 @@ export function Dropdown({ label, items, activePath }: DropdownProps) {
               style={{
                 display: "block",
                 padding: "10px 16px",
-                color: activePath === item.to ? "#f8fafc" : "#94a3b8",
+                color: activePath === item.to ? "var(--text-primary)" : "var(--text-muted)",
                 textDecoration: "none",
                 borderRadius: "8px",
                 fontSize: "14px",
@@ -110,13 +110,13 @@ export function Dropdown({ label, items, activePath }: DropdownProps) {
                 transition: "all 0.2s ease",
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = "rgba(71, 85, 105, 0.3)";
-                e.currentTarget.style.color = "#f8fafc";
+                e.currentTarget.style.background = "var(--border-light)";
+                e.currentTarget.style.color = "var(--text-primary)";
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.background = "transparent";
                 e.currentTarget.style.color =
-                  activePath === item.to ? "#f8fafc" : "#94a3b8";
+                  activePath === item.to ? "var(--text-primary)" : "var(--text-muted)";
               }}
             >
               <span style={{ marginRight: "8px" }}>{item.icon}</span>

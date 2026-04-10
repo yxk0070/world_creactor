@@ -167,11 +167,11 @@ export function StorylineRenderer({ data }: StorylineRendererProps) {
         <div
           style={{
             background:
-              "linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(139, 92, 246, 0.1) 100%)",
+              "linear-gradient(135deg, var(--accent-bg) 0%, rgba(139, 92, 246, 0.1) 100%)",
             borderRadius: "12px",
             padding: "20px",
             marginBottom: "20px",
-            border: "1px solid rgba(99, 102, 241, 0.3)",
+            border: "1px solid var(--accent-bg-hover)",
           }}
         >
           <h2
@@ -218,7 +218,7 @@ export function StorylineRenderer({ data }: StorylineRendererProps) {
             <p
               style={{
                 marginTop: "12px",
-                color: "#cbd5e1",
+                color: "var(--text-tertiary)",
                 fontSize: "14px",
                 lineHeight: "1.6",
                 fontStyle: "italic",
@@ -251,7 +251,7 @@ export function StorylineRenderer({ data }: StorylineRendererProps) {
                       bottom: "-24px",
                       width: "2px",
                       background:
-                        "linear-gradient(180deg, #6366f1 0%, rgba(99, 102, 241, 0.3) 100%)",
+                        "linear-gradient(180deg, var(--accent-primary) 0%, var(--accent-bg-hover) 100%)",
                     }}
                   />
                 )}
@@ -269,7 +269,7 @@ export function StorylineRenderer({ data }: StorylineRendererProps) {
                       height: "40px",
                       borderRadius: "50%",
                       background:
-                        "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
+                        "linear-gradient(135deg, var(--accent-primary) 0%, #8b5cf6 100%)",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
@@ -287,10 +287,10 @@ export function StorylineRenderer({ data }: StorylineRendererProps) {
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div
                       style={{
-                        background: "rgba(30, 41, 59, 0.8)",
+                        background: "var(--bg-card-80)",
                         borderRadius: "12px",
                         padding: "16px",
-                        border: "1px solid rgba(71, 85, 105, 0.5)",
+                        border: "1px solid var(--border-dark)",
                       }}
                     >
                       <div
@@ -305,7 +305,7 @@ export function StorylineRenderer({ data }: StorylineRendererProps) {
                           style={{
                             fontSize: "16px",
                             fontWeight: "600",
-                            color: "#e2e8f0",
+                            color: "var(--text-secondary)",
                             margin: 0,
                           }}
                         >
@@ -325,9 +325,9 @@ export function StorylineRenderer({ data }: StorylineRendererProps) {
                                 loadingEventIndex !== null
                                   ? "not-allowed"
                                   : "pointer",
-                              background: "rgba(99, 102, 241, 0.2)",
+                              background: "var(--accent-bg)",
                               color: "#a5b4fc",
-                              border: "1px solid rgba(99, 102, 241, 0.3)",
+                              border: "1px solid var(--accent-bg-hover)",
                               borderRadius: "4px",
                               opacity:
                                 loadingEventIndex !== null &&
@@ -346,7 +346,7 @@ export function StorylineRenderer({ data }: StorylineRendererProps) {
                       {event.description && (
                         <p
                           style={{
-                            color: "#cbd5e1",
+                            color: "var(--text-tertiary)",
                             fontSize: "14px",
                             lineHeight: "1.7",
                             marginBottom: "12px",
@@ -429,7 +429,7 @@ export function StorylineRenderer({ data }: StorylineRendererProps) {
                           style={{
                             marginTop: "16px",
                             paddingLeft: "16px",
-                            borderLeft: "2px solid rgba(71, 85, 105, 0.4)",
+                            borderLeft: "2px solid var(--border-light)",
                           }}
                         >
                           {event.sub_events.map(
@@ -457,7 +457,7 @@ export function StorylineRenderer({ data }: StorylineRendererProps) {
                                   </span>
                                   <span
                                     style={{
-                                      color: "#e2e8f0",
+                                      color: "var(--text-secondary)",
                                       fontSize: "14px",
                                       fontWeight: "600",
                                     }}
@@ -467,7 +467,7 @@ export function StorylineRenderer({ data }: StorylineRendererProps) {
                                 </div>
                                 <div
                                   style={{
-                                    color: "#cbd5e1",
+                                    color: "var(--text-tertiary)",
                                     fontSize: "13px",
                                     lineHeight: "1.6",
                                     paddingLeft: "16px",

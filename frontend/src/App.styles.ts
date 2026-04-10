@@ -1,13 +1,12 @@
 export const styles = {
   container: {
     minHeight: "100vh",
-    background:
-      "linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%)",
+    background: "var(--bg-root)",
   },
   nav: {
-    background: "rgba(30, 41, 59, 0.95)",
+    background: "var(--bg-solid-card-85)",
     backdropFilter: "blur(12px)",
-    borderBottom: "1px solid rgba(71, 85, 105, 0.5)",
+    borderBottom: "1px solid var(--border-dark)",
     padding: "0 32px",
     position: "sticky" as const,
     top: 0,
@@ -26,14 +25,14 @@ export const styles = {
     fontSize: "24px",
     marginRight: "24px",
     fontWeight: "700",
-    color: "#f8fafc",
+    color: "var(--text-primary)",
     cursor: "pointer",
     transition: "transform 0.2s ease",
   },
   scenarioContainer: {
     display: "flex",
     gap: "4px",
-    background: "rgba(15, 23, 42, 0.6)",
+    background: "var(--bg-glass)",
     padding: "4px",
     borderRadius: "12px",
     marginLeft: "auto",
@@ -43,9 +42,9 @@ export const styles = {
     borderRadius: "8px",
     border: "none",
     background: active
-      ? "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)"
+      ? "linear-gradient(135deg, var(--accent-primary) 0%, #8b5cf6 100%)"
       : "transparent",
-    color: active ? "#ffffff" : "#94a3b8",
+    color: active ? "#ffffff" : "var(--text-muted)",
     cursor: "pointer",
     fontWeight: active ? "600" : "400",
     transition: "all 0.2s ease",
@@ -57,8 +56,8 @@ export const styles = {
     padding: "32px",
   },
   chatSection: {
-    background: "rgba(30, 41, 59, 0.85)",
-    border: "1px solid rgba(71, 85, 105, 0.5)",
+    background: "var(--bg-solid-card-85)",
+    border: "1px solid var(--border-dark)",
     borderRadius: "20px",
     padding: "32px",
     marginBottom: "24px",
@@ -67,11 +66,11 @@ export const styles = {
     fontSize: "28px",
     fontWeight: "700",
     marginBottom: "8px",
-    color: "#f8fafc",
+    color: "var(--text-primary)",
     margin: 0,
   },
   chatSubtitle: {
-    color: "#94a3b8",
+    color: "var(--text-muted)",
     marginBottom: "24px",
   },
   inputForm: {
@@ -81,16 +80,16 @@ export const styles = {
   input: {
     flex: 1,
     padding: "14px 20px",
-    border: "2px solid rgba(71, 85, 105, 0.5)",
+    border: "2px solid var(--border-dark)",
     borderRadius: "12px",
-    background: "rgba(15, 23, 42, 0.8)",
-    color: "#f8fafc",
+    background: "var(--input-bg)",
+    color: "var(--text-primary)",
     fontSize: "15px",
     boxSizing: "border-box" as const,
   },
   submitButton: {
     padding: "14px 28px",
-    background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
+    background: "linear-gradient(135deg, var(--accent-primary) 0%, #8b5cf6 100%)",
     color: "white",
     border: "none",
     borderRadius: "12px",
@@ -104,7 +103,7 @@ export const styles = {
     gap: "16px",
   },
   message: {
-    border: "1px solid rgba(71, 85, 105, 0.5)",
+    border: "1px solid var(--border-dark)",
     borderRadius: "16px",
     padding: "20px 24px",
   },
@@ -113,14 +112,14 @@ export const styles = {
     marginBottom: "12px",
   },
   messageContent: {
-    color: "#e2e8f0",
+    color: "var(--text-secondary)",
     whiteSpace: "pre-wrap" as const,
   },
   dataSection: {
     marginTop: "16px",
   },
   summary: {
-    color: "#94a3b8",
+    color: "var(--text-muted)",
     cursor: "pointer",
   },
   dataContent: {
@@ -128,10 +127,10 @@ export const styles = {
   },
   rawData: {
     padding: "16px",
-    background: "rgba(15, 23, 42, 0.6)",
+    background: "var(--bg-glass)",
     borderRadius: "8px",
     fontSize: "13px",
-    color: "#94a3b8",
+    color: "var(--text-muted)",
     overflow: "auto" as const,
     margin: 0,
   },

@@ -19,15 +19,15 @@ export function ArticleRenderer({ data }: { data: any }) {
     <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
       <div
         style={{
-          background: "rgba(15, 23, 42, 0.6)",
+          background: "var(--bg-glass)",
           borderRadius: "12px",
           padding: "24px",
-          border: "1px solid rgba(51, 65, 85, 0.8)",
+          border: "1px solid var(--border-dark-80)",
         }}
       >
         <h2
           style={{
-            color: "#f8fafc",
+            color: "var(--text-primary)",
             fontSize: "24px",
             fontWeight: "700",
             margin: "0 0 16px 0",
@@ -52,7 +52,7 @@ export function ArticleRenderer({ data }: { data: any }) {
                 <span
                   key={index}
                   style={{
-                    background: "rgba(99, 102, 241, 0.2)",
+                    background: "var(--accent-bg)",
                     color: "#a5b4fc",
                     padding: "4px 12px",
                     borderRadius: "6px",
@@ -80,7 +80,7 @@ export function ArticleRenderer({ data }: { data: any }) {
 
         <div
           style={{
-            color: "#e2e8f0",
+            color: "var(--text-secondary)",
             fontSize: "16px",
             lineHeight: "1.8",
             whiteSpace: "pre-wrap",
@@ -93,15 +93,15 @@ export function ArticleRenderer({ data }: { data: any }) {
       {articleData.event_description && (
         <div
           style={{
-            background: "rgba(30, 41, 59, 0.6)",
+            background: "var(--bg-card-60)",
             borderRadius: "12px",
             padding: "16px",
-            borderLeft: "4px solid #6366f1",
+            borderLeft: "4px solid var(--accent-primary)",
           }}
         >
           <h4
             style={{
-              color: "#94a3b8",
+              color: "var(--text-muted)",
               fontSize: "12px",
               margin: "0 0 8px 0",
               textTransform: "uppercase",
@@ -109,7 +109,7 @@ export function ArticleRenderer({ data }: { data: any }) {
           >
             原始事件描述
           </h4>
-          <p style={{ color: "#cbd5e1", margin: 0, fontSize: "14px" }}>
+          <p style={{ color: "var(--text-tertiary)", margin: 0, fontSize: "14px" }}>
             {articleData.event_description}
           </p>
         </div>

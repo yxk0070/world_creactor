@@ -80,7 +80,7 @@ export function WorldviewRenderer({ data }: WorldviewRendererProps) {
       末世: "#78716c",
       玄幻: "#ec4899",
     };
-    return colors[genre] || "#818cf8";
+    return colors[genre] || "var(--accent-purple)";
   };
 
   return (
@@ -123,12 +123,12 @@ export function WorldviewRenderer({ data }: WorldviewRendererProps) {
               {basic_settings.genre && (
                 <span
                   style={{
-                    background: "rgba(15, 23, 42, 0.6)",
+                    background: "var(--bg-glass)",
                     padding: "6px 12px",
                     borderRadius: "8px",
                     fontSize: "13px",
-                    color: "#cbd5e1",
-                    border: "1px solid rgba(71, 85, 105, 0.5)",
+                    color: "var(--text-tertiary)",
+                    border: "1px solid var(--border-dark)",
                   }}
                 >
                   📚 {basic_settings.genre}
@@ -139,12 +139,12 @@ export function WorldviewRenderer({ data }: WorldviewRendererProps) {
                 basic_settings.power_level) && (
                 <span
                   style={{
-                    background: "rgba(15, 23, 42, 0.6)",
+                    background: "var(--bg-glass)",
                     padding: "6px 12px",
                     borderRadius: "8px",
                     fontSize: "13px",
-                    color: "#cbd5e1",
-                    border: "1px solid rgba(71, 85, 105, 0.5)",
+                    color: "var(--text-tertiary)",
+                    border: "1px solid var(--border-dark)",
                   }}
                 >
                   💪 个体战斗力水平:{" "}
@@ -157,12 +157,12 @@ export function WorldviewRenderer({ data }: WorldviewRendererProps) {
               {basic_settings.technology_level && (
                 <span
                   style={{
-                    background: "rgba(15, 23, 42, 0.6)",
+                    background: "var(--bg-glass)",
                     padding: "6px 12px",
                     borderRadius: "8px",
                     fontSize: "13px",
-                    color: "#cbd5e1",
-                    border: "1px solid rgba(71, 85, 105, 0.5)",
+                    color: "var(--text-tertiary)",
+                    border: "1px solid var(--border-dark)",
                   }}
                 >
                   🔧 科技: {basic_settings.technology_level}
@@ -176,9 +176,9 @@ export function WorldviewRenderer({ data }: WorldviewRendererProps) {
               style={{
                 marginTop: "16px",
                 padding: "12px 16px",
-                background: "rgba(15, 23, 42, 0.6)",
+                background: "var(--bg-glass)",
                 borderRadius: "8px",
-                color: "#94a3b8",
+                color: "var(--text-muted)",
                 fontStyle: "italic",
                 fontSize: "14px",
                 lineHeight: "1.6",
@@ -195,17 +195,17 @@ export function WorldviewRenderer({ data }: WorldviewRendererProps) {
         {geography && (
           <div
             style={{
-              background: "rgba(30, 41, 59, 0.85)",
+              background: "var(--bg-solid-card-85)",
               borderRadius: "12px",
               padding: "20px",
-              border: "1px solid rgba(71, 85, 105, 0.5)",
+              border: "1px solid var(--border-dark)",
             }}
           >
             <h3
               style={{
                 fontSize: "16px",
                 fontWeight: "600",
-                color: "#818cf8",
+                color: "var(--accent-purple)",
                 marginBottom: "12px",
                 display: "flex",
                 alignItems: "center",
@@ -216,7 +216,7 @@ export function WorldviewRenderer({ data }: WorldviewRendererProps) {
             </h3>
             <p
               style={{
-                color: "#cbd5e1",
+                color: "var(--text-tertiary)",
                 fontSize: "14px",
                 lineHeight: "1.8",
                 margin: 0,
@@ -230,17 +230,17 @@ export function WorldviewRenderer({ data }: WorldviewRendererProps) {
         {social_structure && (
           <div
             style={{
-              background: "rgba(30, 41, 59, 0.85)",
+              background: "var(--bg-solid-card-85)",
               borderRadius: "12px",
               padding: "20px",
-              border: "1px solid rgba(71, 85, 105, 0.5)",
+              border: "1px solid var(--border-dark)",
             }}
           >
             <h3
               style={{
                 fontSize: "16px",
                 fontWeight: "600",
-                color: "#818cf8",
+                color: "var(--accent-purple)",
                 marginBottom: "12px",
                 display: "flex",
                 alignItems: "center",
@@ -251,7 +251,7 @@ export function WorldviewRenderer({ data }: WorldviewRendererProps) {
             </h3>
             <p
               style={{
-                color: "#cbd5e1",
+                color: "var(--text-tertiary)",
                 fontSize: "14px",
                 lineHeight: "1.8",
                 margin: 0,
@@ -265,17 +265,17 @@ export function WorldviewRenderer({ data }: WorldviewRendererProps) {
         {history && (
           <div
             style={{
-              background: "rgba(30, 41, 59, 0.85)",
+              background: "var(--bg-solid-card-85)",
               borderRadius: "12px",
               padding: "20px",
-              border: "1px solid rgba(71, 85, 105, 0.5)",
+              border: "1px solid var(--border-dark)",
             }}
           >
             <h3
               style={{
                 fontSize: "16px",
                 fontWeight: "600",
-                color: "#818cf8",
+                color: "var(--accent-purple)",
                 marginBottom: "12px",
                 display: "flex",
                 alignItems: "center",
@@ -286,7 +286,7 @@ export function WorldviewRenderer({ data }: WorldviewRendererProps) {
             </h3>
             <p
               style={{
-                color: "#cbd5e1",
+                color: "var(--text-tertiary)",
                 fontSize: "14px",
                 lineHeight: "1.8",
                 margin: 0,
@@ -303,7 +303,7 @@ export function WorldviewRenderer({ data }: WorldviewRendererProps) {
               style={{
                 fontSize: "16px",
                 fontWeight: "600",
-                color: "#818cf8",
+                color: "var(--accent-purple)",
                 marginBottom: "16px",
                 display: "flex",
                 alignItems: "center",
@@ -319,10 +319,10 @@ export function WorldviewRenderer({ data }: WorldviewRendererProps) {
                 <div
                   key={index}
                   style={{
-                    background: "rgba(30, 41, 59, 0.85)",
+                    background: "var(--bg-solid-card-85)",
                     borderRadius: "12px",
                     padding: "20px",
-                    border: "1px solid rgba(71, 85, 105, 0.5)",
+                    border: "1px solid var(--border-dark)",
                     position: "relative",
                     overflow: "hidden",
                   }}
@@ -335,7 +335,7 @@ export function WorldviewRenderer({ data }: WorldviewRendererProps) {
                       width: "4px",
                       height: "100%",
                       background:
-                        "linear-gradient(180deg, #6366f1 0%, #8b5cf6 100%)",
+                        "linear-gradient(180deg, var(--accent-primary) 0%, #8b5cf6 100%)",
                     }}
                   />
 
@@ -344,7 +344,7 @@ export function WorldviewRenderer({ data }: WorldviewRendererProps) {
                       style={{
                         fontSize: "15px",
                         fontWeight: "600",
-                        color: "#f8fafc",
+                        color: "var(--text-primary)",
                         marginBottom: "8px",
                       }}
                     >
@@ -354,7 +354,7 @@ export function WorldviewRenderer({ data }: WorldviewRendererProps) {
                     {faction.description && (
                       <p
                         style={{
-                          color: "#94a3b8",
+                          color: "var(--text-muted)",
                           fontSize: "13px",
                           lineHeight: "1.6",
                           marginBottom: "12px",
@@ -380,7 +380,7 @@ export function WorldviewRenderer({ data }: WorldviewRendererProps) {
                             borderRadius: "6px",
                             fontSize: "12px",
                             color: "#a5b4fc",
-                            border: "1px solid rgba(99, 102, 241, 0.3)",
+                            border: "1px solid var(--accent-bg-hover)",
                           }}
                         >
                           👑 {faction.leader}

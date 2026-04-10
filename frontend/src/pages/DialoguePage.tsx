@@ -181,18 +181,18 @@ export function DialoguePage() {
         {showStream && (
           <div
             style={{
-              background: "rgba(30, 41, 59, 0.8)",
+              background: "var(--bg-card-80)",
               borderRadius: "16px",
               padding: "24px",
               marginTop: "24px",
-              border: "1px solid rgba(71, 85, 105, 0.5)",
+              border: "1px solid var(--border-dark)",
             }}
           >
             <h3
               style={{
                 fontSize: "16px",
                 fontWeight: "600",
-                color: "#f8fafc",
+                color: "var(--text-primary)",
                 marginBottom: "16px",
                 display: "flex",
                 alignItems: "center",
@@ -204,9 +204,9 @@ export function DialoguePage() {
             <div
               style={{
                 padding: "16px",
-                background: "rgba(15, 23, 42, 0.6)",
+                background: "var(--bg-glass)",
                 borderRadius: "12px",
-                color: "#cbd5e1",
+                color: "var(--text-tertiary)",
                 fontSize: "14px",
                 fontFamily: "monospace",
                 display: "flex",
@@ -215,7 +215,7 @@ export function DialoguePage() {
               }}
             >
               <span
-                style={{ color: "#6366f1", animation: "pulse 1.5s infinite" }}
+                style={{ color: "var(--accent-primary)", animation: "pulse 1.5s infinite" }}
               >
                 ●
               </span>

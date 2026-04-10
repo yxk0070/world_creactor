@@ -3,10 +3,10 @@ export function RelatedCharacterRenderer({ data }: { data: any }) {
     <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
       <div
         style={{
-          background: "rgba(30, 41, 59, 0.8)",
+          background: "var(--bg-card-80)",
           borderRadius: "12px",
           padding: "20px",
-          border: "1px solid rgba(71, 85, 105, 0.5)",
+          border: "1px solid var(--border-dark)",
         }}
       >
         <div
@@ -17,13 +17,13 @@ export function RelatedCharacterRenderer({ data }: { data: any }) {
             marginBottom: "16px",
           }}
         >
-          <h4 style={{ margin: 0, color: "#f8fafc", fontSize: "20px" }}>
+          <h4 style={{ margin: 0, color: "var(--text-primary)", fontSize: "20px" }}>
             {data.name}
           </h4>
           <div style={{ display: "flex", gap: "8px" }}>
             <span
               style={{
-                background: "rgba(99, 102, 241, 0.2)",
+                background: "var(--accent-bg)",
                 color: "#a5b4fc",
                 padding: "4px 10px",
                 borderRadius: "6px",
@@ -48,7 +48,7 @@ export function RelatedCharacterRenderer({ data }: { data: any }) {
 
         <p
           style={{
-            color: "#cbd5e1",
+            color: "var(--text-tertiary)",
             fontSize: "14px",
             marginBottom: "16px",
             lineHeight: "1.6",
@@ -61,7 +61,7 @@ export function RelatedCharacterRenderer({ data }: { data: any }) {
           <div style={{ marginBottom: "16px" }}>
             <strong
               style={{
-                color: "#94a3b8",
+                color: "var(--text-muted)",
                 fontSize: "14px",
                 display: "block",
                 marginBottom: "8px",
@@ -74,12 +74,12 @@ export function RelatedCharacterRenderer({ data }: { data: any }) {
                 <span
                   key={idx}
                   style={{
-                    background: "rgba(15, 23, 42, 0.6)",
-                    color: "#cbd5e1",
+                    background: "var(--bg-glass)",
+                    color: "var(--text-tertiary)",
                     padding: "4px 12px",
                     borderRadius: "12px",
                     fontSize: "12px",
-                    border: "1px solid rgba(71, 85, 105, 0.3)",
+                    border: "1px solid var(--border-light)",
                   }}
                 >
                   {trait}
@@ -93,7 +93,7 @@ export function RelatedCharacterRenderer({ data }: { data: any }) {
           <div>
             <strong
               style={{
-                color: "#94a3b8",
+                color: "var(--text-muted)",
                 fontSize: "14px",
                 display: "block",
                 marginBottom: "8px",
@@ -108,21 +108,21 @@ export function RelatedCharacterRenderer({ data }: { data: any }) {
                 <div
                   key={idx}
                   style={{
-                    background: "rgba(15, 23, 42, 0.6)",
+                    background: "var(--bg-glass)",
                     padding: "12px",
                     borderRadius: "8px",
                     fontSize: "13px",
                   }}
                 >
-                  <div style={{ color: "#f8fafc", marginBottom: "4px" }}>
+                  <div style={{ color: "var(--text-primary)", marginBottom: "4px" }}>
                     与{" "}
                     <span style={{ color: "#38bdf8", fontWeight: "bold" }}>
                       {rel.target}
                     </span>
-                    <span style={{ margin: "0 8px", color: "#94a3b8" }}>-</span>
+                    <span style={{ margin: "0 8px", color: "var(--text-muted)" }}>-</span>
                     <span style={{ color: "#10b981" }}>{rel.type}</span>
                   </div>
-                  <div style={{ color: "#94a3b8" }}>{rel.description}</div>
+                  <div style={{ color: "var(--text-muted)" }}>{rel.description}</div>
                 </div>
               ))}
             </div>

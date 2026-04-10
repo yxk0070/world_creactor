@@ -151,7 +151,7 @@ export function CharactersPage() {
                   <div style={{ padding: "16px" }}>
                     <p
                       style={{
-                        color: "#94a3b8",
+                        color: "var(--text-muted)",
                         fontSize: "14px",
                         marginBottom: "16px",
                       }}
@@ -160,10 +160,10 @@ export function CharactersPage() {
                     </p>
                     <pre
                       style={{
-                        background: "rgba(15, 23, 42, 0.8)",
+                        background: "var(--bg-glass-80)",
                         padding: "16px",
                         borderRadius: "8px",
-                        color: "#cbd5e1",
+                        color: "var(--text-tertiary)",
                         fontSize: "12px",
                         lineHeight: "1.6",
                         overflowX: "auto",

@@ -36,14 +36,14 @@ function TaskCard({ task }: { task: Task }) {
         ...styles.taskCard,
         borderColor:
           task.status === "running"
-            ? "rgba(99, 102, 241, 0.5)"
+            ? "var(--accent-bg-50)"
             : task.status === "completed"
               ? "rgba(16, 185, 129, 0.5)"
               : "rgba(239, 68, 68, 0.5)",
         // 添加动态渐变背景
         background:
           task.status === "running"
-            ? "linear-gradient(90deg, rgba(30,41,59,0.95) 0%, rgba(45,61,90,0.95) 50%, rgba(30,41,59,0.95) 100%)"
+            ? "linear-gradient(90deg, var(--bg-solid-card-85) 0%, var(--bg-card-80) 50%, var(--bg-solid-card-85) 100%)"
             : task.status === "completed"
               ? "rgba(6, 78, 59, 0.95)"
               : "rgba(127, 29, 29, 0.95)",

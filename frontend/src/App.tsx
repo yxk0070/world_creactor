@@ -11,11 +11,13 @@ import { ShortScriptPage } from "./pages/ShortScriptPage";
 import { TimelineAnalysisPage } from "./pages/TimelineAnalysisPage";
 import { WorldviewAnalysisPage } from "./pages/WorldviewAnalysisPage";
 import { MainPage } from "./pages/MainPage";
+import { ResultsPage } from "./pages/ResultsPage";
 import { NavLink } from "./components/NavLink";
 import { Dropdown } from "./components/Dropdown";
 import { TaskSidebar } from "./components/TaskSidebar";
 import { styles } from "./App.styles";
 import { useScenario } from "./contexts/ScenarioContext";
+import { useTheme } from "./contexts/ThemeContext";
 
 interface NavItem {
   to: string;
@@ -27,6 +29,7 @@ export function App() {
   const location = useLocation();
   const navigate = useNavigate();
   const { scenario, setScenario } = useScenario();
+  const { theme, toggleTheme } = useTheme();
 
   const creationItems: NavItem[] = [
     { to: "/worldview", icon: "🌍", label: "世界观" },
@@ -69,9 +72,21 @@ export function App() {
             items={analysisItems}
             activePath={location.pathname}
           />
-          <NavLink to="/cache">📦 历史记录</NavLink>
+          <NavLink to="/results">📦 生成成果</NavLink>
 
           <div style={styles.scenarioContainer}>
+            <button
+              type="button"
+              onClick={toggleTheme}
+              style={{
+                ...styles.scenarioBtn(false),
+                marginRight: "8px",
+                padding: "6px 12px",
+              }}
+              title={theme === "dark" ? "切换到亮色模式" : "切换到暗色模式"}
+            >
+              {theme === "dark" ? "☀️" : "🌙"}
+            </button>
             {["游戏", "小说", "剧本"].map((s) => (
               <button
                 key={s}
@@ -100,6 +115,7 @@ export function App() {
         <Route path="/short-script" element={<ShortScriptPage />} />
         <Route path="/timeline-analysis" element={<TimelineAnalysisPage />} />
         <Route path="/worldview-analysis" element={<WorldviewAnalysisPage />} />
+        <Route path="/results/*" element={<ResultsPage />} />
         <Route path="/cache" element={<CachePage />} />
       </Routes>
     </div>

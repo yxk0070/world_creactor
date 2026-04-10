@@ -7,10 +7,10 @@ export const styles = {
     maxHeight: "calc(100vh - 120px)",
     overflowY: "auto" as const,
     zIndex: 1000,
-    background: "rgba(15, 23, 42, 0.85)",
+    background: "var(--bg-solid-card-85)",
     backdropFilter: "blur(12px)",
     borderRadius: "16px",
-    border: "1px solid rgba(71, 85, 105, 0.5)",
+    border: "1px solid var(--border-dark)",
     padding: "16px",
     boxShadow:
       "0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.1)",
@@ -18,10 +18,10 @@ export const styles = {
   title: {
     fontSize: "14px",
     fontWeight: "600",
-    color: "#cbd5e1",
+    color: "var(--text-tertiary)",
     margin: "0 0 16px 0",
     paddingBottom: "12px",
-    borderBottom: "1px solid rgba(71, 85, 105, 0.5)",
+    borderBottom: "1px solid var(--border-dark)",
   },
   taskList: {
     display: "flex",
@@ -47,11 +47,11 @@ export const styles = {
   taskTitle: {
     fontSize: "14px",
     fontWeight: "600",
-    color: "#f8fafc",
+    color: "var(--text-primary)",
   },
   taskMessage: {
     fontSize: "12px",
-    color: "#94a3b8",
+    color: "var(--text-muted)",
     paddingLeft: "22px",
   },
   dots: {

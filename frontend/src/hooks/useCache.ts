@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 
 interface CacheItem {
   id: string;
@@ -35,6 +36,8 @@ export function useCache() {
   const [selectedItem, setSelectedItem] = useState<CacheItem | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  const location = useLocation();
+
   useEffect(() => {
     loadCache();
   }, []);
@@ -57,6 +60,20 @@ export function useCache() {
         }
         setCacheData(sortedData);
         setStats(data.stats);
+
+        // 如果 URL 中有 id 参数，自动选中
+        const params = new URLSearchParams(location.search);
+        const targetId = params.get("id");
+        if (targetId) {
+          for (const key in sortedData) {
+            const found = sortedData[key].find((item) => item.id === targetId);
+            if (found) {
+              setSelectedItem(found);
+              setSelectedCategory(key);
+              break;
+            }
+          }
+        }
       }
     } catch (error) {
       console.error("加载缓存失败:", error);

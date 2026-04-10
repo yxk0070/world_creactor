@@ -159,7 +159,7 @@ export function CoreStorylinePage() {
                     onChange={(e) => setGenerateDetails(e.target.checked)}
                     style={{ marginRight: "8px" }}
                   />
-                  <span style={{ fontSize: "14px", color: "#cbd5e1" }}>
+                  <span style={{ fontSize: "14px", color: "var(--text-tertiary)" }}>
                     同时为每个事件生成3-5个细节子节点（注意：长篇慎用，容易导致截断）
                   </span>
                 </div>
@@ -239,7 +239,7 @@ export function CoreStorylinePage() {
                       <div style={{ padding: "16px" }}>
                         <p
                           style={{
-                            color: "#94a3b8",
+                            color: "var(--text-muted)",
                             fontSize: "14px",
                             marginBottom: "16px",
                           }}
@@ -248,10 +248,10 @@ export function CoreStorylinePage() {
                         </p>
                         <pre
                           style={{
-                            background: "rgba(15, 23, 42, 0.8)",
+                            background: "var(--bg-glass-80)",
                             padding: "16px",
                             borderRadius: "8px",
-                            color: "#cbd5e1",
+                            color: "var(--text-tertiary)",
                             fontSize: "12px",
                             lineHeight: "1.6",
                             overflowX: "auto",

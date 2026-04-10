@@ -61,15 +61,15 @@ export function ArticlePage() {
       <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
         <div
           style={{
-            background: "rgba(15, 23, 42, 0.6)",
+            background: "var(--bg-glass)",
             borderRadius: "12px",
             padding: "24px",
-            border: "1px solid rgba(51, 65, 85, 0.8)",
+            border: "1px solid var(--border-dark-80)",
           }}
         >
           <h2
             style={{
-              color: "#f8fafc",
+              color: "var(--text-primary)",
               fontSize: "24px",
               fontWeight: "700",
               margin: "0 0 16px 0",
@@ -94,7 +94,7 @@ export function ArticlePage() {
                   <span
                     key={index}
                     style={{
-                      background: "rgba(99, 102, 241, 0.2)",
+                      background: "var(--accent-bg)",
                       color: "#a5b4fc",
                       padding: "4px 12px",
                       borderRadius: "6px",
@@ -122,7 +122,7 @@ export function ArticlePage() {
 
           <div
             style={{
-              color: "#e2e8f0",
+              color: "var(--text-secondary)",
               fontSize: "16px",
               lineHeight: "1.8",
               whiteSpace: "pre-wrap",
@@ -135,15 +135,15 @@ export function ArticlePage() {
         {articleData.event_description && (
           <div
             style={{
-              background: "rgba(30, 41, 59, 0.6)",
+              background: "var(--bg-card-60)",
               borderRadius: "12px",
               padding: "16px",
-              borderLeft: "4px solid #6366f1",
+              borderLeft: "4px solid var(--accent-primary)",
             }}
           >
             <h4
               style={{
-                color: "#94a3b8",
+                color: "var(--text-muted)",
                 fontSize: "12px",
                 margin: "0 0 8px 0",
                 textTransform: "uppercase",
@@ -151,7 +151,7 @@ export function ArticlePage() {
             >
               原始事件描述
             </h4>
-            <p style={{ color: "#cbd5e1", margin: 0, fontSize: "14px" }}>
+            <p style={{ color: "var(--text-tertiary)", margin: 0, fontSize: "14px" }}>
               {articleData.event_description}
             </p>
           </div>
@@ -191,17 +191,17 @@ export function ArticlePage() {
             <div style={{ marginBottom: "24px" }}>
               <div
                 style={{
-                  background: "rgba(15, 23, 42, 0.6)",
+                  background: "var(--bg-glass)",
                   borderRadius: "12px",
                   padding: "16px",
-                  border: "1px solid rgba(51, 65, 85, 0.8)",
+                  border: "1px solid var(--border-dark-80)",
                   maxHeight: "300px",
                   overflowY: "auto",
                 }}
               >
                 <h4
                   style={{
-                    color: "#cbd5e1",
+                    color: "var(--text-tertiary)",
                     margin: "0 0 12px 0",
                     fontSize: "14px",
                   }}
@@ -235,7 +235,7 @@ export function ArticlePage() {
 
                     if (!events || events.length === 0) {
                       return (
-                        <div style={{ color: "#94a3b8", padding: "12px" }}>
+                        <div style={{ color: "var(--text-muted)", padding: "12px" }}>
                           该故事线没有可用的事件
                         </div>
                       );
@@ -249,35 +249,35 @@ export function ArticlePage() {
                           onClick={() => handleSelectEvent(story, event, idx)}
                           style={{
                             background: isSelected
-                              ? "rgba(99, 102, 241, 0.2)"
-                              : "rgba(30, 41, 59, 0.8)",
+                              ? "var(--accent-bg)"
+                              : "var(--bg-card-80)",
                             padding: "12px",
                             borderRadius: "8px",
                             cursor: "pointer",
                             border: isSelected
                               ? "1px solid rgba(99, 102, 241, 0.8)"
-                              : "1px solid rgba(71, 85, 105, 0.5)",
+                              : "1px solid var(--border-dark)",
                             transition: "all 0.2s",
                           }}
                           onMouseEnter={(e) => {
                             if (!isSelected) {
                               e.currentTarget.style.background =
-                                "rgba(71, 85, 105, 0.5)";
-                              e.currentTarget.style.borderColor = "#6366f1";
+                                "var(--border-dark)";
+                              e.currentTarget.style.borderColor = "var(--accent-primary)";
                             }
                           }}
                           onMouseLeave={(e) => {
                             if (!isSelected) {
                               e.currentTarget.style.background =
-                                "rgba(30, 41, 59, 0.8)";
+                                "var(--bg-card-80)";
                               e.currentTarget.style.borderColor =
-                                "rgba(71, 85, 105, 0.5)";
+                                "var(--border-dark)";
                             }
                           }}
                         >
                           <div
                             style={{
-                              color: isSelected ? "#a5b4fc" : "#f8fafc",
+                              color: isSelected ? "#a5b4fc" : "var(--text-primary)",
                               fontWeight: "600",
                               marginBottom: "4px",
                               fontSize: "14px",
@@ -288,7 +288,7 @@ export function ArticlePage() {
                           </div>
                           <div
                             style={{
-                              color: isSelected ? "#c7d2fe" : "#94a3b8",
+                              color: isSelected ? "#c7d2fe" : "var(--text-muted)",
                               fontSize: "12px",
                               display: "-webkit-box",
                               WebkitLineClamp: 2,

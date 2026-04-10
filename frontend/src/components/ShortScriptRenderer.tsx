@@ -52,16 +52,16 @@ export function ShortScriptRenderer({ data }: ShortScriptRendererProps) {
   return (
     <div
       style={{
-        background: "rgba(15, 23, 42, 0.6)",
+        background: "var(--bg-glass)",
         borderRadius: "16px",
         padding: "24px",
-        border: "1px solid rgba(71, 85, 105, 0.4)",
+        border: "1px solid var(--border-light)",
       }}
     >
       <h3
         style={{
           margin: "0 0 20px 0",
-          color: "#f8fafc",
+          color: "var(--text-primary)",
           display: "flex",
           alignItems: "center",
           gap: "10px",
@@ -84,10 +84,10 @@ export function ShortScriptRenderer({ data }: ShortScriptRendererProps) {
                 <div key={line.id} style={{
                   marginTop: "16px",
                   padding: "10px 16px",
-                  background: "linear-gradient(90deg, rgba(99, 102, 241, 0.2) 0%, rgba(15, 23, 42, 0) 100%)",
-                  borderLeft: "4px solid #6366f1",
+                  background: "linear-gradient(90deg, var(--accent-bg) 0%, rgba(15, 23, 42, 0) 100%)",
+                  borderLeft: "4px solid var(--accent-primary)",
                   borderRadius: "0 8px 8px 0",
-                  color: "#f8fafc",
+                  color: "var(--text-primary)",
                   fontWeight: "bold",
                   fontSize: "16px",
                   letterSpacing: "1px"
@@ -103,10 +103,10 @@ export function ShortScriptRenderer({ data }: ShortScriptRendererProps) {
                   display: "flex", 
                   alignItems: "flex-start",
                   gap: "12px",
-                  background: "rgba(30, 41, 59, 0.4)",
+                  background: "var(--bg-card)",
                   padding: "12px 16px",
                   borderRadius: "8px",
-                  border: "1px solid rgba(51, 65, 85, 0.5)"
+                  border: "1px solid var(--border-dark)"
                 }}>
                   <div style={{
                     minWidth: "60px",
@@ -121,7 +121,7 @@ export function ShortScriptRenderer({ data }: ShortScriptRendererProps) {
                     {line.key}
                   </div>
                   <div style={{
-                    color: "#e2e8f0",
+                    color: "var(--text-secondary)",
                     fontSize: "15px",
                     lineHeight: "1.6",
                     flex: 1
@@ -133,7 +133,7 @@ export function ShortScriptRenderer({ data }: ShortScriptRendererProps) {
             }
             return (
               <div key={line.id} style={{ 
-                color: "#94a3b8", 
+                color: "var(--text-muted)", 
                 fontSize: "15px", 
                 lineHeight: "1.6",
                 padding: "0 16px"
@@ -144,13 +144,13 @@ export function ShortScriptRenderer({ data }: ShortScriptRendererProps) {
           })
         ) : (
           <div style={{ 
-            color: "#e2e8f0", 
+            color: "var(--text-secondary)", 
             whiteSpace: "pre-wrap", 
             lineHeight: "1.8",
-            background: "rgba(30, 41, 59, 0.4)",
+            background: "var(--bg-card)",
             padding: "20px",
             borderRadius: "12px",
-            border: "1px solid rgba(51, 65, 85, 0.5)"
+            border: "1px solid var(--border-dark)"
           }}>
             {typeof content === "string" ? content : JSON.stringify(content, null, 2)}
           </div>

@@ -5,8 +5,8 @@ export const styles = {
     padding: "32px",
   },
   headerCard: {
-    background: "rgba(30, 41, 59, 0.85)",
-    border: "1px solid rgba(71, 85, 105, 0.5)",
+    background: "var(--bg-solid-card-85)",
+    border: "1px solid var(--border-dark)",
     borderRadius: "20px",
     padding: "32px",
     marginBottom: "24px",
@@ -15,10 +15,10 @@ export const styles = {
     fontSize: "28px",
     fontWeight: "700",
     marginBottom: "8px",
-    color: "#f8fafc",
+    color: "var(--text-primary)",
   },
   subtitle: {
-    color: "#94a3b8",
+    color: "var(--text-muted)",
     marginBottom: "24px",
   },
   form: {
@@ -29,10 +29,10 @@ export const styles = {
   textarea: {
     flex: 1,
     padding: "14px 20px",
-    border: "2px solid rgba(71, 85, 105, 0.5)",
+    border: "2px solid var(--border-dark)",
     borderRadius: "12px",
-    background: "rgba(15, 23, 42, 0.8)",
-    color: "#f8fafc",
+    background: "var(--bg-glass-80)",
+    color: "var(--text-primary)",
     fontSize: "15px",
     minHeight: "52px",
     maxHeight: "200px",
@@ -46,7 +46,7 @@ export const styles = {
   submitBtn: (isGenerating: boolean) => ({
     padding: "14px 28px",
     height: "52px",
-    background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
+    background: "linear-gradient(135deg, var(--accent-primary) 0%, #8b5cf6 100%)",
     color: "white",
     border: "none",
     borderRadius: "12px",
@@ -70,8 +70,8 @@ export const styles = {
     maxWidth: isUser ? "80%" : "100%",
     background: isUser
       ? "linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)"
-      : "rgba(30, 41, 59, 0.85)",
-    border: isUser ? "none" : "1px solid rgba(71, 85, 105, 0.5)",
+      : "var(--bg-solid-card-85)",
+    border: isUser ? "none" : "1px solid var(--border-dark)",
     borderRadius: isUser ? "20px 20px 4px 20px" : "20px 20px 20px 4px",
     padding: "20px 24px",
     boxShadow:
@@ -86,7 +86,7 @@ export const styles = {
     gap: "8px",
   }),
   messageText: (isUser: boolean) => ({
-    color: isUser ? "#ffffff" : "#e2e8f0",
+    color: isUser ? "#ffffff" : "var(--text-secondary)",
     whiteSpace: "pre-wrap" as const,
     wordBreak: "break-word" as const,
     lineHeight: "1.6",
@@ -100,14 +100,14 @@ export const styles = {
     gap: "20px",
   },
   workflowContainer: {
-    background: "rgba(30, 41, 59, 0.85)",
-    border: "1px solid rgba(71, 85, 105, 0.5)",
+    background: "var(--bg-solid-card-85)",
+    border: "1px solid var(--border-dark)",
     borderRadius: "16px",
     padding: "24px",
     marginTop: "8px",
   },
   workflowTitle: {
-    color: "#f8fafc",
+    color: "var(--text-primary)",
     margin: "0 0 16px 0",
     display: "flex",
     alignItems: "center",
@@ -130,18 +130,18 @@ export const styles = {
     background:
       status === "running"
         ? "rgba(99, 102, 241, 0.1)"
-        : "rgba(15, 23, 42, 0.6)",
+        : "var(--bg-glass)",
     border:
       status === "running"
-        ? "1px solid rgba(99, 102, 241, 0.5)"
-        : "1px solid rgba(51, 65, 85, 0.5)",
+        ? "1px solid var(--accent-bg-50)"
+        : "1px solid var(--border-dark)",
     borderRadius: "8px",
     color:
       status === "pending"
-        ? "#94a3b8"
+        ? "var(--text-muted)"
         : status === "failed"
           ? "#ef4444"
-          : "#f8fafc",
+          : "var(--text-primary)",
     transition: "all 0.3s ease",
   }),
   workflowStepIcon: (status: string) => ({
@@ -152,7 +152,7 @@ export const styles = {
       status === "completed"
         ? "#10b981"
         : status === "running"
-          ? "#6366f1"
+          ? "var(--accent-primary)"
           : "#334155",
     display: "flex",
     alignItems: "center",

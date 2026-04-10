@@ -49,7 +49,7 @@ export function WorldviewAnalysisPage() {
               <span
                 style={{
                   fontSize: "12px",
-                  color: article.length > 3800 ? "#ef4444" : "#94a3b8",
+                  color: article.length > 3800 ? "#ef4444" : "var(--text-muted)",
                 }}
               >
                 {article.length} / 4000 字
@@ -114,10 +114,10 @@ export function WorldviewAnalysisPage() {
                   <p style={styles.fallbackText}>以下是分析结果的完整内容：</p>
                   <pre
                     style={{
-                      background: "rgba(15, 23, 42, 0.8)",
+                      background: "var(--bg-glass-80)",
                       padding: "16px",
                       borderRadius: "8px",
-                      color: "#cbd5e1",
+                      color: "var(--text-tertiary)",
                       fontSize: "12px",
                       lineHeight: "1.6",
                       overflowX: "auto",

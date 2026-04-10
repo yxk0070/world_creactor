@@ -68,10 +68,10 @@ export function CharacterRenderer({ data }: CharacterRendererProps) {
       反派: "#ef4444",
       导师: "#3b82f6",
       盟友: "#10b981",
-      配角: "#6366f1",
+      配角: "var(--accent-primary)",
       路人: "#64748b",
     };
-    return colors[role] || "#818cf8";
+    return colors[role] || "var(--accent-purple)";
   };
 
   return (
@@ -93,7 +93,7 @@ export function CharacterRenderer({ data }: CharacterRendererProps) {
             style={{
               borderBottom:
                 index < characterList.length - 1
-                  ? "2px dashed rgba(71, 85, 105, 0.4)"
+                  ? "2px dashed var(--border-light)"
                   : "none",
               paddingBottom: index < characterList.length - 1 ? "40px" : "0",
             }}
@@ -136,12 +136,12 @@ export function CharacterRenderer({ data }: CharacterRendererProps) {
                     {basicInfo.role && (
                       <span
                         style={{
-                          background: "rgba(15, 23, 42, 0.6)",
+                          background: "var(--bg-glass)",
                           padding: "6px 12px",
                           borderRadius: "8px",
                           fontSize: "13px",
-                          color: "#cbd5e1",
-                          border: "1px solid rgba(71, 85, 105, 0.5)",
+                          color: "var(--text-tertiary)",
+                          border: "1px solid var(--border-dark)",
                         }}
                       >
                         🎭 {basicInfo.role}
@@ -150,12 +150,12 @@ export function CharacterRenderer({ data }: CharacterRendererProps) {
                     {basicInfo.age && (
                       <span
                         style={{
-                          background: "rgba(15, 23, 42, 0.6)",
+                          background: "var(--bg-glass)",
                           padding: "6px 12px",
                           borderRadius: "8px",
                           fontSize: "13px",
-                          color: "#cbd5e1",
-                          border: "1px solid rgba(71, 85, 105, 0.5)",
+                          color: "var(--text-tertiary)",
+                          border: "1px solid var(--border-dark)",
                         }}
                       >
                         🎂 {basicInfo.age}
@@ -170,7 +170,7 @@ export function CharacterRenderer({ data }: CharacterRendererProps) {
                           padding: "6px 12px",
                           borderRadius: "8px",
                           fontSize: "13px",
-                          color: basicInfo.is_important ? "#f59e0b" : "#94a3b8",
+                          color: basicInfo.is_important ? "#f59e0b" : "var(--text-muted)",
                           border: basicInfo.is_important
                             ? "1px solid rgba(245, 158, 11, 0.3)"
                             : "1px solid rgba(100, 116, 139, 0.3)",
@@ -187,9 +187,9 @@ export function CharacterRenderer({ data }: CharacterRendererProps) {
                     style={{
                       marginTop: "16px",
                       padding: "12px 16px",
-                      background: "rgba(15, 23, 42, 0.6)",
+                      background: "var(--bg-glass)",
                       borderRadius: "8px",
-                      color: "#94a3b8",
+                      color: "var(--text-muted)",
                       fontSize: "14px",
                       lineHeight: "1.6",
                       borderLeft: `3px solid ${getRoleColor(basicInfo.role)}`,
@@ -207,17 +207,17 @@ export function CharacterRenderer({ data }: CharacterRendererProps) {
               {character.personality && (
                 <div
                   style={{
-                    background: "rgba(30, 41, 59, 0.85)",
+                    background: "var(--bg-solid-card-85)",
                     borderRadius: "12px",
                     padding: "20px",
-                    border: "1px solid rgba(71, 85, 105, 0.5)",
+                    border: "1px solid var(--border-dark)",
                   }}
                 >
                   <h3
                     style={{
                       fontSize: "16px",
                       fontWeight: "600",
-                      color: "#818cf8",
+                      color: "var(--accent-purple)",
                       marginBottom: "12px",
                       display: "flex",
                       alignItems: "center",
@@ -228,7 +228,7 @@ export function CharacterRenderer({ data }: CharacterRendererProps) {
                   </h3>
                   <p
                     style={{
-                      color: "#cbd5e1",
+                      color: "var(--text-tertiary)",
                       fontSize: "14px",
                       lineHeight: "1.8",
                       margin: 0,
@@ -242,17 +242,17 @@ export function CharacterRenderer({ data }: CharacterRendererProps) {
               {character.background && (
                 <div
                   style={{
-                    background: "rgba(30, 41, 59, 0.85)",
+                    background: "var(--bg-solid-card-85)",
                     borderRadius: "12px",
                     padding: "20px",
-                    border: "1px solid rgba(71, 85, 105, 0.5)",
+                    border: "1px solid var(--border-dark)",
                   }}
                 >
                   <h3
                     style={{
                       fontSize: "16px",
                       fontWeight: "600",
-                      color: "#818cf8",
+                      color: "var(--accent-purple)",
                       marginBottom: "12px",
                       display: "flex",
                       alignItems: "center",
@@ -263,7 +263,7 @@ export function CharacterRenderer({ data }: CharacterRendererProps) {
                   </h3>
                   <p
                     style={{
-                      color: "#cbd5e1",
+                      color: "var(--text-tertiary)",
                       fontSize: "14px",
                       lineHeight: "1.8",
                       margin: 0,
@@ -277,17 +277,17 @@ export function CharacterRenderer({ data }: CharacterRendererProps) {
               {character.abilities && character.abilities.length > 0 && (
                 <div
                   style={{
-                    background: "rgba(30, 41, 59, 0.85)",
+                    background: "var(--bg-solid-card-85)",
                     borderRadius: "12px",
                     padding: "20px",
-                    border: "1px solid rgba(71, 85, 105, 0.5)",
+                    border: "1px solid var(--border-dark)",
                   }}
                 >
                   <h3
                     style={{
                       fontSize: "16px",
                       fontWeight: "600",
-                      color: "#818cf8",
+                      color: "var(--accent-purple)",
                       marginBottom: "12px",
                       display: "flex",
                       alignItems: "center",
@@ -302,7 +302,7 @@ export function CharacterRenderer({ data }: CharacterRendererProps) {
                         <li
                           key={index}
                           style={{
-                            color: "#cbd5e1",
+                            color: "var(--text-tertiary)",
                             fontSize: "14px",
                             lineHeight: "1.8",
                             marginBottom: "6px",
@@ -319,17 +319,17 @@ export function CharacterRenderer({ data }: CharacterRendererProps) {
               {character.position_in_world && (
                 <div
                   style={{
-                    background: "rgba(30, 41, 59, 0.85)",
+                    background: "var(--bg-solid-card-85)",
                     borderRadius: "12px",
                     padding: "20px",
-                    border: "1px solid rgba(71, 85, 105, 0.5)",
+                    border: "1px solid var(--border-dark)",
                   }}
                 >
                   <h3
                     style={{
                       fontSize: "16px",
                       fontWeight: "600",
-                      color: "#818cf8",
+                      color: "var(--accent-purple)",
                       marginBottom: "12px",
                       display: "flex",
                       alignItems: "center",
@@ -340,7 +340,7 @@ export function CharacterRenderer({ data }: CharacterRendererProps) {
                   </h3>
                   <p
                     style={{
-                      color: "#cbd5e1",
+                      color: "var(--text-tertiary)",
                       fontSize: "14px",
                       lineHeight: "1.8",
                       margin: 0,
@@ -355,17 +355,17 @@ export function CharacterRenderer({ data }: CharacterRendererProps) {
                 character.relationships.length > 0 && (
                   <div
                     style={{
-                      background: "rgba(30, 41, 59, 0.85)",
+                      background: "var(--bg-solid-card-85)",
                       borderRadius: "12px",
                       padding: "20px",
-                      border: "1px solid rgba(71, 85, 105, 0.5)",
+                      border: "1px solid var(--border-dark)",
                     }}
                   >
                     <h3
                       style={{
                         fontSize: "16px",
                         fontWeight: "600",
-                        color: "#818cf8",
+                        color: "var(--accent-purple)",
                         marginBottom: "12px",
                         display: "flex",
                         alignItems: "center",
@@ -380,13 +380,13 @@ export function CharacterRenderer({ data }: CharacterRendererProps) {
                           <li
                             key={index}
                             style={{
-                              color: "#cbd5e1",
+                              color: "var(--text-tertiary)",
                               fontSize: "14px",
                               lineHeight: "1.8",
                               marginBottom: "6px",
                             }}
                           >
-                            <strong style={{ color: "#f8fafc" }}>
+                            <strong style={{ color: "var(--text-primary)" }}>
                               {rel.target}
                             </strong>{" "}
                             ({rel.type}): {rel.description}
@@ -408,7 +408,7 @@ export function CharacterRenderer({ data }: CharacterRendererProps) {
                     style={{
                       fontSize: "16px",
                       fontWeight: "600",
-                      color: "#818cf8",
+                      color: "var(--accent-purple)",
                       marginBottom: "16px",
                       display: "flex",
                       alignItems: "center",
@@ -427,10 +427,10 @@ export function CharacterRenderer({ data }: CharacterRendererProps) {
                     {lifeExperience.birth && (
                       <div
                         style={{
-                          background: "rgba(30, 41, 59, 0.85)",
+                          background: "var(--bg-solid-card-85)",
                           borderRadius: "12px",
                           padding: "20px",
-                          border: "1px solid rgba(71, 85, 105, 0.5)",
+                          border: "1px solid var(--border-dark)",
                           position: "relative",
                           overflow: "hidden",
                         }}
@@ -459,7 +459,7 @@ export function CharacterRenderer({ data }: CharacterRendererProps) {
                           </h4>
                           <p
                             style={{
-                              color: "#94a3b8",
+                              color: "var(--text-muted)",
                               fontSize: "13px",
                               lineHeight: "1.6",
                               margin: 0,
@@ -474,10 +474,10 @@ export function CharacterRenderer({ data }: CharacterRendererProps) {
                     {lifeExperience.childhood && (
                       <div
                         style={{
-                          background: "rgba(30, 41, 59, 0.85)",
+                          background: "var(--bg-solid-card-85)",
                           borderRadius: "12px",
                           padding: "20px",
-                          border: "1px solid rgba(71, 85, 105, 0.5)",
+                          border: "1px solid var(--border-dark)",
                           position: "relative",
                           overflow: "hidden",
                         }}
@@ -506,7 +506,7 @@ export function CharacterRenderer({ data }: CharacterRendererProps) {
                           </h4>
                           <p
                             style={{
-                              color: "#94a3b8",
+                              color: "var(--text-muted)",
                               fontSize: "13px",
                               lineHeight: "1.6",
                               margin: 0,
@@ -521,10 +521,10 @@ export function CharacterRenderer({ data }: CharacterRendererProps) {
                     {lifeExperience.growth && (
                       <div
                         style={{
-                          background: "rgba(30, 41, 59, 0.85)",
+                          background: "var(--bg-solid-card-85)",
                           borderRadius: "12px",
                           padding: "20px",
-                          border: "1px solid rgba(71, 85, 105, 0.5)",
+                          border: "1px solid var(--border-dark)",
                           position: "relative",
                           overflow: "hidden",
                         }}
@@ -553,7 +553,7 @@ export function CharacterRenderer({ data }: CharacterRendererProps) {
                           </h4>
                           <p
                             style={{
-                              color: "#94a3b8",
+                              color: "var(--text-muted)",
                               fontSize: "13px",
                               lineHeight: "1.6",
                               margin: 0,
@@ -569,10 +569,10 @@ export function CharacterRenderer({ data }: CharacterRendererProps) {
                       lifeExperience.major_events.length > 0 && (
                         <div
                           style={{
-                            background: "rgba(30, 41, 59, 0.85)",
+                            background: "var(--bg-solid-card-85)",
                             borderRadius: "12px",
                             padding: "20px",
-                            border: "1px solid rgba(71, 85, 105, 0.5)",
+                            border: "1px solid var(--border-dark)",
                           }}
                         >
                           <h4
@@ -591,7 +591,7 @@ export function CharacterRenderer({ data }: CharacterRendererProps) {
                                 <li
                                   key={index}
                                   style={{
-                                    color: "#cbd5e1",
+                                    color: "var(--text-tertiary)",
                                     fontSize: "14px",
                                     lineHeight: "1.8",
                                     marginBottom: "6px",
@@ -608,10 +608,10 @@ export function CharacterRenderer({ data }: CharacterRendererProps) {
                     {lifeExperience.death && (
                       <div
                         style={{
-                          background: "rgba(30, 41, 59, 0.85)",
+                          background: "var(--bg-solid-card-85)",
                           borderRadius: "12px",
                           padding: "20px",
-                          border: "1px solid rgba(71, 85, 105, 0.5)",
+                          border: "1px solid var(--border-dark)",
                           position: "relative",
                           overflow: "hidden",
                         }}
@@ -640,7 +640,7 @@ export function CharacterRenderer({ data }: CharacterRendererProps) {
                           </h4>
                           <p
                             style={{
-                              color: "#94a3b8",
+                              color: "var(--text-muted)",
                               fontSize: "13px",
                               lineHeight: "1.6",
                               margin: 0,

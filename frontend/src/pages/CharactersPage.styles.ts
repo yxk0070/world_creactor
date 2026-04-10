@@ -1,7 +1,7 @@
 export const styles = {
   container: {
     minHeight: "100vh",
-    background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
+    background: "linear-gradient(135deg, var(--bg-root) 0%, var(--bg-solid-card) 100%)",
     padding: "24px",
   },
   header: {
@@ -13,9 +13,9 @@ export const styles = {
   },
   backButton: {
     padding: "8px 16px",
-    background: "rgba(99, 102, 241, 0.2)",
+    background: "var(--accent-bg)",
     color: "#a5b4fc",
-    border: "1px solid rgba(99, 102, 241, 0.3)",
+    border: "1px solid var(--accent-bg-hover)",
     borderRadius: "8px",
     cursor: "pointer",
     fontSize: "14px",
@@ -25,7 +25,7 @@ export const styles = {
   title: {
     fontSize: "28px",
     fontWeight: "700",
-    color: "#f8fafc",
+    color: "var(--text-primary)",
     margin: 0,
   },
   content: {
@@ -39,26 +39,26 @@ export const styles = {
     width: "100%",
   },
   inputSection: {
-    background: "rgba(30, 41, 59, 0.85)",
+    background: "var(--bg-solid-card-85)",
     borderRadius: "16px",
     padding: "24px",
-    border: "1px solid rgba(71, 85, 105, 0.5)",
+    border: "1px solid var(--border-dark)",
   },
   label: {
     display: "block",
     fontSize: "14px",
     fontWeight: "600",
-    color: "#cbd5e1",
+    color: "var(--text-tertiary)",
     marginBottom: "8px",
     flex: 1,
   },
   input: {
     width: "100%",
     padding: "12px",
-    background: "rgba(15, 23, 42, 0.8)",
-    border: "1px solid rgba(51, 65, 85, 0.8)",
+    background: "var(--bg-glass-80)",
+    border: "1px solid var(--border-dark-80)",
     borderRadius: "12px",
-    color: "#e2e8f0",
+    color: "var(--text-secondary)",
     fontSize: "14px",
     marginBottom: "16px",
     boxSizing: "border-box" as const,
@@ -66,10 +66,10 @@ export const styles = {
   select: {
     width: "100%",
     padding: "12px",
-    background: "rgba(15, 23, 42, 0.8)",
-    border: "1px solid rgba(51, 65, 85, 0.8)",
+    background: "var(--bg-glass-80)",
+    border: "1px solid var(--border-dark-80)",
     borderRadius: "12px",
-    color: "#e2e8f0",
+    color: "var(--text-secondary)",
     fontSize: "14px",
     marginBottom: "16px",
     cursor: "pointer",
@@ -91,7 +91,7 @@ export const styles = {
   button: {
     width: "100%",
     padding: "14px 24px",
-    background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
+    background: "linear-gradient(135deg, var(--accent-primary) 0%, #8b5cf6 100%)",
     color: "white",
     border: "none",
     borderRadius: "12px",
@@ -101,19 +101,19 @@ export const styles = {
     transition: "all 0.3s ease",
   },
   streamingSection: {
-    background: "rgba(30, 41, 59, 0.85)",
+    background: "var(--bg-solid-card-85)",
     borderRadius: "16px",
     padding: "24px",
-    border: "1px solid rgba(71, 85, 105, 0.5)",
+    border: "1px solid var(--border-dark)",
   },
   sectionTitle: {
     fontSize: "18px",
     fontWeight: "600",
-    color: "#e2e8f0",
+    color: "var(--text-secondary)",
     margin: "0 0 16px",
   },
   streamingContent: {
-    background: "rgba(15, 23, 42, 0.6)",
+    background: "var(--bg-glass)",
     borderRadius: "12px",
     padding: "20px",
   },
@@ -130,10 +130,10 @@ export const styles = {
     animation: "pulse 1s infinite",
   },
   resultSection: {
-    background: "rgba(30, 41, 59, 0.85)",
+    background: "var(--bg-solid-card-85)",
     borderRadius: "16px",
     padding: "24px",
-    border: "1px solid rgba(71, 85, 105, 0.5)",
+    border: "1px solid var(--border-dark)",
   },
   resultContent: {
     maxHeight: "600px",

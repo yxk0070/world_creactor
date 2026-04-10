@@ -55,16 +55,16 @@ export function DialogueRenderer({ data }: DialogueRendererProps) {
   return (
     <div
       style={{
-        background: "rgba(15, 23, 42, 0.6)",
+        background: "var(--bg-glass)",
         borderRadius: "16px",
         padding: "24px",
-        border: "1px solid rgba(71, 85, 105, 0.4)",
+        border: "1px solid var(--border-light)",
       }}
     >
       <h3
         style={{
           margin: "0 0 20px 0",
-          color: "#f8fafc",
+          color: "var(--text-primary)",
           display: "flex",
           alignItems: "center",
           gap: "10px",
@@ -79,10 +79,10 @@ export function DialogueRenderer({ data }: DialogueRendererProps) {
           display: "flex",
           flexDirection: "column",
           gap: "16px",
-          background: "rgba(30, 41, 59, 0.4)",
+          background: "var(--bg-card)",
           padding: "24px",
           borderRadius: "12px",
-          border: "1px solid rgba(51, 65, 85, 0.5)",
+          border: "1px solid var(--border-dark)",
         }}
       >
         {parsedLines.length > 0 ? (
@@ -92,7 +92,7 @@ export function DialogueRenderer({ data }: DialogueRendererProps) {
                 <div key={line.id} style={{ 
                   textAlign: "center", 
                   margin: "12px 0",
-                  color: "#94a3b8",
+                  color: "var(--text-muted)",
                   fontSize: "14px",
                   fontWeight: 600,
                   background: "rgba(0,0,0,0.2)",
@@ -120,7 +120,7 @@ export function DialogueRenderer({ data }: DialogueRendererProps) {
                     )}
                   </div>
                   <div style={{ 
-                    color: "#e2e8f0", 
+                    color: "var(--text-secondary)", 
                     fontSize: "15px", 
                     lineHeight: "1.6",
                     background: "rgba(255,255,255,0.03)",
@@ -134,13 +134,13 @@ export function DialogueRenderer({ data }: DialogueRendererProps) {
               );
             }
             return (
-              <div key={line.id} style={{ color: "#cbd5e1", fontSize: "15px", lineHeight: "1.6", fontStyle: "italic", paddingLeft: "16px" }}>
+              <div key={line.id} style={{ color: "var(--text-tertiary)", fontSize: "15px", lineHeight: "1.6", fontStyle: "italic", paddingLeft: "16px" }}>
                 {line.text}
               </div>
             );
           })
         ) : (
-          <div style={{ color: "#e2e8f0", whiteSpace: "pre-wrap", lineHeight: "1.8" }}>
+          <div style={{ color: "var(--text-secondary)", whiteSpace: "pre-wrap", lineHeight: "1.8" }}>
             {typeof content === "string" ? content : JSON.stringify(content, null, 2)}
           </div>
         )}

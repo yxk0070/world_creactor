@@ -7,15 +7,15 @@ interface NavLinkProps {
 
 export function NavLink({ to, children }: NavLinkProps) {
   const location = useLocation();
-  const isActive = location.pathname === to;
+  const isActive = location.pathname === to || (to !== '/' && location.pathname.startsWith(to));
 
   return (
     <Link
       to={to}
       style={{
         padding: "12px 24px",
-        background: isActive ? "rgba(99, 102, 241, 0.3)" : "transparent",
-        color: isActive ? "#f8fafc" : "#94a3b8",
+        background: isActive ? "var(--accent-bg-hover)" : "transparent",
+        color: isActive ? "var(--text-primary)" : "var(--text-muted)",
         textDecoration: "none",
         borderRadius: "12px",
         fontWeight: isActive ? "600" : "500",
@@ -25,14 +25,14 @@ export function NavLink({ to, children }: NavLinkProps) {
       }}
       onMouseEnter={(e) => {
         if (!isActive) {
-          e.currentTarget.style.background = "rgba(71, 85, 105, 0.3)";
-          e.currentTarget.style.color = "#f8fafc";
+          e.currentTarget.style.background = "var(--border-light)";
+          e.currentTarget.style.color = "var(--text-primary)";
         }
       }}
       onMouseLeave={(e) => {
         if (!isActive) {
           e.currentTarget.style.background = "transparent";
-          e.currentTarget.style.color = "#94a3b8";
+          e.currentTarget.style.color = "var(--text-muted)";
         }
       }}
     >

@@ -72,7 +72,7 @@ export function JsonRenderer({ data }: JsonRendererProps) {
                 {key}:
               </span>
             )}
-            <span style={{ color: "#94a3b8" }}>[]</span>
+            <span style={{ color: "var(--text-muted)" }}>[]</span>
           </div>
         );
       }
@@ -84,11 +84,11 @@ export function JsonRenderer({ data }: JsonRendererProps) {
                 {key}:
               </span>
             )}
-            <span style={{ color: "#94a3b8" }}>[</span>
+            <span style={{ color: "var(--text-muted)" }}>[</span>
           </div>
           {value.map((item, index) => renderValue(item, index, depth + 1))}
           <div style={{ marginLeft: `${indent}px`, padding: "4px 0" }}>
-            <span style={{ color: "#94a3b8" }}>]</span>
+            <span style={{ color: "var(--text-muted)" }}>]</span>
           </div>
         </div>
       );
@@ -104,7 +104,7 @@ export function JsonRenderer({ data }: JsonRendererProps) {
                 {key}:
               </span>
             )}
-            <span style={{ color: "#94a3b8" }}>{"{}"}</span>
+            <span style={{ color: "var(--text-muted)" }}>{"{}"}</span>
           </div>
         );
       }
@@ -116,11 +116,11 @@ export function JsonRenderer({ data }: JsonRendererProps) {
                 {key}:
               </span>
             )}
-            <span style={{ color: "#94a3b8" }}>{"{"}</span>
+            <span style={{ color: "var(--text-muted)" }}>{"{"}</span>
           </div>
           {keys.map((k) => renderValue(value[k], k, depth + 1))}
           <div style={{ marginLeft: `${indent}px`, padding: "4px 0" }}>
-            <span style={{ color: "#94a3b8" }}>{"}"}</span>
+            <span style={{ color: "var(--text-muted)" }}>{"}"}</span>
           </div>
         </div>
       );
