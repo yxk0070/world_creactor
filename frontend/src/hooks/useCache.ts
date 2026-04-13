@@ -17,15 +17,13 @@ interface Stats {
   [key: string]: number;
 }
 
-const categoryNames: { [key: string]: string } = {
-  worldview: "🌍 世界观",
-  worldview_analysis: "🔍 世界观分析",
-  character: "👤 人物",
-  related_character: "🔗 关联人物",
-  story: "📜 故事线",
-  generate_article_from_event: "✍️ 事件文章",
-  generate_dialogue: "💬 对话文案",
-  generate_short_script: "🎬 短剧脚本",
+const categoryNames: Record<string, string> = {
+  worldview: "🌍 世界观与分析",
+  character: "👤 人物与关系网",
+  story: "📜 故事线与时间线",
+  article: "✍️ 事件文章",
+  dialogue: "💬 对话文案",
+  script: "🎬 短剧脚本",
 };
 
 export function useCache() {

@@ -1,19 +1,8 @@
-# Web framework
-flask
-
-# Env
-python-dotenv
-
-# LLM orchestration
-langchain
-langchain-core
-langchain-openai
-
-# Common transitive deps (explicit for safety)
-pydantic
-jsonschema
-tenacity
-PyYAML
-
-# HTTP (used in tests / some environments)
-requests
+flask==3.0.3
+flask-cors==4.0.0
+langchain==0.1.13
+langchain-openai==0.1.1
+python-dotenv==1.0.1
+requests==2.31.0
+sseclient-py==1.8.0
+pydantic==2.6.4

@@ -1,31 +1,32 @@
 {
-  "name": "k-agent-frontend",
-  "version": "1.0.0",
+  "name": "world-creator-frontend",
+  "private": true,
+  "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "tsc -b && vite build",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "type-check": "tsc --noEmit",
-    "format": "prettier --write \"src/**/*.{ts,tsx,css,md}\"",
-    "lint": "eslint \"src/**/*.{ts,tsx}\""
+    "format": "prettier --write \"src/**/*.{ts,tsx,css}\""
   },
   "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-router-dom": "^7.13.2"
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.26.2"
   },
   "devDependencies": {
-    "@types/react": "^18.2.43",
-    "@types/react-dom": "^18.2.17",
-    "@typescript-eslint/eslint-plugin": "^8.58.1",
-    "@typescript-eslint/parser": "^8.58.1",
-    "@vitejs/plugin-react": "^4.2.1",
-    "eslint": "^9.39.4",
-    "eslint-plugin-react": "^7.37.5",
-    "eslint-plugin-react-hooks": "^7.0.1",
-    "prettier": "^3.8.1",
-    "typescript": "^6.0.2",
-    "vite": "^5.0.8"
+    "@eslint/js": "^9.9.0",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "eslint": "^9.9.0",
+    "eslint-plugin-react-hooks": "^5.1.0-rc.0",
+    "eslint-plugin-react-refresh": "^0.4.9",
+    "globals": "^15.9.0",
+    "prettier": "^3.3.3",
+    "typescript": "^5.5.3",
+    "typescript-eslint": "^8.0.1",
+    "vite": "^5.4.1"
   }
 }

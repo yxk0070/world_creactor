@@ -38,14 +38,11 @@ class CacheManager:
         """获取空的缓存结构"""
         return {
             "worldview": [],
-            "worldview_analysis": [],
             "character": [],
-            "related_character": [],
             "story": [],
-            "timeline": [],
-            "generate_article_from_event": [],
-            "generate_dialogue": [],
-            "generate_short_script": []
+            "article": [],
+            "dialogue": [],
+            "script": []
         }
     
     def _save_cache(self):
@@ -60,15 +57,15 @@ class CacheManager:
         """根据工具名称获取对应的缓存分类"""
         category_map = {
             "generate_worldview": "worldview",
-            "analyze_worldview": "worldview_analysis",
+            "analyze_worldview": "worldview",
             "generate_character": "character",
-            "generate_related_character": "related_character",
-            "generate_character_network": "related_character",
+            "generate_related_character": "character",
+            "generate_character_network": "character",
             "generate_story": "story",
-            "extract_timeline": "story",  # 将故事线分析与核心故事线合并
-            "generate_article_from_event": "generate_article_from_event",
-            "generate_dialogue": "generate_dialogue",
-            "generate_short_script": "generate_short_script"
+            "extract_timeline": "story",
+            "generate_article_from_event": "article",
+            "generate_dialogue": "dialogue",
+            "generate_short_script": "script"
         }
         return category_map.get(tool_name)
     
@@ -199,11 +196,55 @@ class CacheManager:
         for category in self.cache.values():
             for i, item in enumerate(category):
                 if item["id"] == item_id:
-                    del category[i]
+                    category.pop(i)
                     self._save_cache()
                     print(f"[缓存] 已删除缓存项 (ID: {item_id})")
                     return True
+        print(f"[缓存] 未找到要删除的缓存项 (ID: {item_id})")
         return False
+        
+    def search(self, keyword: str) -> List[Dict]:
+        """全局搜索缓存项
+        
+        Args:
+            keyword: 搜索关键词
+            
+        Returns:
+            匹配的缓存项列表
+        """
+        results = []
+        if not keyword:
+            return results
+            
+        keyword = keyword.lower()
+        for category, items in self.cache.items():
+            for item in items:
+                # 在名称、工具名中搜索
+                if keyword in item.get("name", "").lower() or keyword in item.get("tool_name", "").lower():
+                    results.append(item)
+                    continue
+                    
+                # 在数据内部进行浅层搜索
+                data = item.get("data", {})
+                # 解包数据
+                while True:
+                    if isinstance(data, list) and len(data) > 0:
+                        data = data[0]
+                    elif isinstance(data, dict) and "data" in data:
+                        data = data["data"]
+                    else:
+                        break
+                        
+                if isinstance(data, dict):
+                    # 搜索常见的文本字段
+                    searchable_fields = ["world_name", "core_setting", "name", "role", "title", "story_summary", "content", "dialogue", "script", "event_description"]
+                    for field in searchable_fields:
+                        val = data.get(field)
+                        if val and isinstance(val, str) and keyword in val.lower():
+                            results.append(item)
+                            break
+                            
+        return results
     
     def clear_category(self, category: str) -> bool:
         """清空指定分类的缓存"""
