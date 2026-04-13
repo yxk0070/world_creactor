@@ -1,6 +1,7 @@
 import React from "react";
 import { useArticle } from "../hooks/useArticle";
 import { EditableResult } from "../components/EditableResult";
+import { ArticleRenderer } from "../components/ArticleRenderer";
 import { styles } from "./ArticlePage.styles";
 
 export function ArticlePage() {
@@ -24,141 +25,8 @@ export function ArticlePage() {
     setSelectedStoryId,
     selectedEventIndex,
     handleSelectEvent,
+    generateFullArticle,
   } = useArticle();
-
-  const renderArticle = (data: any) => {
-    let articleData = data;
-
-    if (data.success && data.response) {
-      try {
-        const parsedResponse = JSON.parse(data.response);
-        articleData = parsedResponse;
-      } catch (e) {
-        console.log("解析response失败:", e);
-        articleData = data.response;
-      }
-    }
-
-    if (articleData.data) {
-      articleData = articleData.data;
-      if (articleData.data) {
-        articleData = articleData.data;
-      }
-    }
-
-    if (!articleData.content) {
-      return (
-        <div style={styles.fallback}>
-          <p style={styles.fallbackText}>以下是生成的完整内容：</p>
-          <pre style={styles.rawResult}>
-            {JSON.stringify(articleData, null, 2)}
-          </pre>
-        </div>
-      );
-    }
-
-    return (
-      <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-        <div
-          style={{
-            background: "var(--bg-glass)",
-            borderRadius: "12px",
-            padding: "24px",
-            border: "1px solid var(--border-dark-80)",
-          }}
-        >
-          <h2
-            style={{
-              color: "var(--text-primary)",
-              fontSize: "24px",
-              fontWeight: "700",
-              margin: "0 0 16px 0",
-              textAlign: "center",
-            }}
-          >
-            {articleData.title || "无标题文章"}
-          </h2>
-
-          <div
-            style={{
-              display: "flex",
-              gap: "12px",
-              flexWrap: "wrap",
-              marginBottom: "24px",
-              justifyContent: "center",
-            }}
-          >
-            {articleData.characters_involved &&
-              articleData.characters_involved.map(
-                (char: string, index: number) => (
-                  <span
-                    key={index}
-                    style={{
-                      background: "var(--accent-bg)",
-                      color: "#a5b4fc",
-                      padding: "4px 12px",
-                      borderRadius: "6px",
-                      fontSize: "12px",
-                    }}
-                  >
-                    👤 {char}
-                  </span>
-                )
-              )}
-            {articleData.word_count && (
-              <span
-                style={{
-                  background: "rgba(16, 185, 129, 0.2)",
-                  color: "#6ee7b7",
-                  padding: "4px 12px",
-                  borderRadius: "6px",
-                  fontSize: "12px",
-                }}
-              >
-                📝 约 {articleData.word_count}
-              </span>
-            )}
-          </div>
-
-          <div
-            style={{
-              color: "var(--text-secondary)",
-              fontSize: "16px",
-              lineHeight: "1.8",
-              whiteSpace: "pre-wrap",
-            }}
-          >
-            {articleData.content}
-          </div>
-        </div>
-
-        {articleData.event_description && (
-          <div
-            style={{
-              background: "var(--bg-card-60)",
-              borderRadius: "12px",
-              padding: "16px",
-              borderLeft: "4px solid var(--accent-primary)",
-            }}
-          >
-            <h4
-              style={{
-                color: "var(--text-muted)",
-                fontSize: "12px",
-                margin: "0 0 8px 0",
-                textTransform: "uppercase",
-              }}
-            >
-              原始事件描述
-            </h4>
-            <p style={{ color: "var(--text-tertiary)", margin: 0, fontSize: "14px" }}>
-              {articleData.event_description}
-            </p>
-          </div>
-        )}
-      </div>
-    );
-  };
 
   return (
     <div style={styles.container}>
@@ -199,15 +67,42 @@ export function ArticlePage() {
                   overflowY: "auto",
                 }}
               >
-                <h4
+                <div
                   style={{
-                    color: "var(--text-tertiary)",
-                    margin: "0 0 12px 0",
-                    fontSize: "14px",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginBottom: "12px",
                   }}
                 >
-                  点击事件以快速填充：
-                </h4>
+                  <h4
+                    style={{
+                      color: "var(--text-tertiary)",
+                      margin: 0,
+                      fontSize: "14px",
+                    }}
+                  >
+                    点击事件以快速填充：
+                  </h4>
+                  <button
+                    type="button"
+                    onClick={generateFullArticle}
+                    disabled={isLoading}
+                    style={{
+                      padding: "6px 12px",
+                      background: "var(--accent-primary)",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "6px",
+                      cursor: isLoading ? "not-allowed" : "pointer",
+                      fontSize: "12px",
+                      fontWeight: "600",
+                      opacity: isLoading ? 0.7 : 1,
+                    }}
+                  >
+                    {isLoading ? "生成中..." : "🚀 生成全文 (连载)"}
+                  </button>
+                </div>
                 <div
                   style={{
                     display: "flex",
@@ -235,7 +130,12 @@ export function ArticlePage() {
 
                     if (!events || events.length === 0) {
                       return (
-                        <div style={{ color: "var(--text-muted)", padding: "12px" }}>
+                        <div
+                          style={{
+                            color: "var(--text-muted)",
+                            padding: "12px",
+                          }}
+                        >
                           该故事线没有可用的事件
                         </div>
                       );
@@ -263,7 +163,8 @@ export function ArticlePage() {
                             if (!isSelected) {
                               e.currentTarget.style.background =
                                 "var(--border-dark)";
-                              e.currentTarget.style.borderColor = "var(--accent-primary)";
+                              e.currentTarget.style.borderColor =
+                                "var(--accent-primary)";
                             }
                           }}
                           onMouseLeave={(e) => {
@@ -277,7 +178,9 @@ export function ArticlePage() {
                         >
                           <div
                             style={{
-                              color: isSelected ? "#a5b4fc" : "var(--text-primary)",
+                              color: isSelected
+                                ? "#a5b4fc"
+                                : "var(--text-primary)",
                               fontWeight: "600",
                               marginBottom: "4px",
                               fontSize: "14px",
@@ -288,7 +191,9 @@ export function ArticlePage() {
                           </div>
                           <div
                             style={{
-                              color: isSelected ? "#c7d2fe" : "var(--text-muted)",
+                              color: isSelected
+                                ? "#c7d2fe"
+                                : "var(--text-muted)",
                               fontSize: "12px",
                               display: "-webkit-box",
                               WebkitLineClamp: 2,
@@ -393,10 +298,22 @@ export function ArticlePage() {
               cacheId={(result as any).cache_id}
               onSave={(newData) => setResult(newData)}
               defaultTitle="事件文章"
+              deriveOptions={[
+                {
+                  label: "基于此生成短剧脚本",
+                  to: "/short-script",
+                  stateKey: "articleContext",
+                },
+                {
+                  label: "基于此生成对话文案",
+                  to: "/dialogue",
+                  stateKey: "articleContext",
+                },
+              ]}
             >
               <div style={styles.resultContent}>
                 {checkArticleData(result) ? (
-                  renderArticle(result)
+                  <ArticleRenderer data={result} />
                 ) : (
                   <div style={styles.fallback}>
                     <p style={styles.fallbackText}>以下是生成的完整内容：</p>

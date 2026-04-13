@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useTasks } from "../contexts/TaskContext";
 
 interface Worldview {
@@ -34,6 +34,7 @@ export function useCharacterNetwork() {
   const [streamContent, setStreamContent] = useState("");
   const [showStream, setShowStream] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const { addTask, updateTask } = useTasks();
 
   const filteredCharacters = selectedWorldviewId
@@ -43,7 +44,7 @@ export function useCharacterNetwork() {
 
         // 否则通过匹配世界观名称来筛选
         const selectedWorldview = worldviews.find(
-          (w) => w.id === selectedWorldviewId,
+          (w) => w.id === selectedWorldviewId
         );
         if (!selectedWorldview) return false;
 
@@ -86,13 +87,33 @@ export function useCharacterNetwork() {
   useEffect(() => {
     loadWorldviews();
     loadCharacters();
-  }, []);
+
+    // 如果有角色传过来，尝试在列表中找到它并选中
+    if (location.state && location.state.characterContext) {
+      try {
+        const charCtx = JSON.parse(location.state.characterContext);
+        if (charCtx && charCtx.name) {
+          // 由于异步加载，可能稍后才需要选中，我们可以等字符加载完再选中
+          // 这里先存储到一个ref或者在loadCharacters的.then中处理，简单起见直接设置一个定时器
+          setTimeout(() => {
+            setCharacters((prevChars) => {
+              const found = prevChars.find((c) => c.name === charCtx.name);
+              if (found) {
+                setSelectedCharacters([found.id]);
+              }
+              return prevChars;
+            });
+          }, 500);
+        }
+      } catch (e) {}
+    }
+  }, [location.state]);
 
   useEffect(() => {
     if (selectedWorldviewId) {
       setSelectedCharacters((prev) => {
         const selectedWorldview = worldviews.find(
-          (w) => w.id === selectedWorldviewId,
+          (w) => w.id === selectedWorldviewId
         );
         if (!selectedWorldview) return [];
         const worldName =
@@ -241,22 +262,22 @@ export function useCharacterNetwork() {
       const data = await response.json();
       if (data.success) {
         setStreamContent("生成完成！");
-        
+
         let finalResult = data;
         try {
           if (data.response) {
             const parsedData = JSON.parse(data.response);
             if (Array.isArray(parsedData) && parsedData.length > 0) {
               finalResult = parsedData[0];
-            } else if (parsedData && typeof parsedData === 'object') {
+            } else if (parsedData && typeof parsedData === "object") {
               finalResult = parsedData;
             }
           }
-          
+
           if (data.cache_id) {
-             finalResult.cache_id = data.cache_id;
+            finalResult.cache_id = data.cache_id;
           } else if (data.cache_ids && data.cache_ids.length > 0) {
-             finalResult.cache_id = data.cache_ids[0];
+            finalResult.cache_id = data.cache_ids[0];
           }
         } catch (e) {
           console.warn("CharacterNetwork parse response fallback:", e);

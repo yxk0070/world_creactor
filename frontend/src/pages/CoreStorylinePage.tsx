@@ -159,7 +159,9 @@ export function CoreStorylinePage() {
                     onChange={(e) => setGenerateDetails(e.target.checked)}
                     style={{ marginRight: "8px" }}
                   />
-                  <span style={{ fontSize: "14px", color: "var(--text-tertiary)" }}>
+                  <span
+                    style={{ fontSize: "14px", color: "var(--text-tertiary)" }}
+                  >
                     同时为每个事件生成3-5个细节子节点（注意：长篇慎用，容易导致截断）
                   </span>
                 </div>
@@ -192,6 +194,13 @@ export function CoreStorylinePage() {
               cacheId={(result as any).cache_id}
               onSave={(newData) => setResult(newData)}
               defaultTitle="核心故事线"
+              deriveOptions={[
+                {
+                  label: "基于此生成事件文章",
+                  to: "/article",
+                  stateKey: "storylineContext",
+                },
+              ]}
             >
               <div style={styles.resultContent}>
                 {(() => {

@@ -146,6 +146,10 @@ export function WorldviewPage() {
               cacheId={(result as any).cache_id}
               onSave={(newData) => setResult(newData)}
               defaultTitle="世界观设定"
+              deriveOptions={[
+                { label: "基于此生成人物", to: "/characters", stateKey: "worldviewContext" },
+                { label: "基于此生成故事线", to: "/core-storyline", stateKey: "worldviewContext" }
+              ]}
             >
               <div style={styles.resultContent}>
                 {checkWorldName(result) ? (

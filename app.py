@@ -622,7 +622,8 @@ def get_agent_executor(scenario: str = "小说"):
 - 如果用户提供了人物简介/背景故事，请务必在生成时参考并扩展该背景故事
 
 【人物生成 JSON 格式】
-如果使用 generate_character，请返回以下 JSON 格式：
+如果使用 generate_character，请返回以下 JSON 格式。
+注意：人物姓名必须根据世界观和背景设定进行原创设计，禁止使用千篇一律的默认名字（如“林默”、“李逍遥”、“张三”等），请发挥创造力！
 {{{{
   "tool": "generate_character",
   "status": "completed",
@@ -649,7 +650,8 @@ def get_agent_executor(scenario: str = "小说"):
 }}}}
 
 【关联人物生成 JSON 格式】
-如果使用 generate_related_character，请返回以下 JSON 格式：
+如果使用 generate_related_character，请返回以下 JSON 格式。
+注意：人物姓名必须原创，切勿使用诸如“林默”之类的套路化名字！
 {{{{
   "tool": "generate_related_character",
   "status": "completed",
@@ -766,7 +768,8 @@ def get_agent_executor(scenario: str = "小说"):
             "title": "细节节点标题",
             "description": "细节节点描述"
           }}}}
-        ]
+        ],
+        "transition_to_next": "（可选）写一段平滑的过渡篇章，解释这个事件结束后，主角团是如何过渡、启程前往下一个事件的。如果是最后一个事件则为空。"
       }}}},
       {{{{
         "event_order": 2,
@@ -775,7 +778,8 @@ def get_agent_executor(scenario: str = "小说"):
         "key_characters": ["人物1", "人物2"],
         "location": "事件发生地点",
         "significance": "事件在故事中的意义",
-        "sub_events": []
+        "sub_events": [],
+        "transition_to_next": ""
       }}}}
     ],
     "story_summary": "完整故事摘要",
@@ -1942,6 +1946,32 @@ def get_cache():
             return jsonify({'error': '未找到缓存项'}), 404
     except Exception as e:
         print(f"[DEBUG] 获取缓存错误: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/cache/save', methods=['POST'])
+def save_cache():
+    """手动保存一条缓存数据"""
+    try:
+        req_data = request.json
+        tool_name = req_data.get('type')
+        data_to_save = req_data.get('data')
+        name = req_data.get('name')
+        worldview_id = req_data.get('worldview_id')
+        
+        if not tool_name or not data_to_save:
+            return jsonify({'error': '请提供 type(tool_name) 和 data'}), 400
+            
+        # 兼容外层没有包 tool 的情况
+        if isinstance(data_to_save, dict) and 'tool' not in data_to_save:
+            data_to_save['tool'] = tool_name
+            
+        cache_id = cache_manager.save(tool_name, data_to_save, name=name, worldview_id=worldview_id)
+        return jsonify({'success': True, 'id': cache_id})
+    except Exception as e:
+        print(f"[DEBUG] 手动保存缓存错误: {e}")
+        import traceback
+        traceback.print_exc()
         return jsonify({'success': False, 'error': str(e)}), 500
 
 

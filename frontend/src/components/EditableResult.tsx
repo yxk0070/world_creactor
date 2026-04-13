@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { styles } from "./EditableResult.styles";
 
 interface EditableResultProps {
@@ -7,6 +8,7 @@ interface EditableResultProps {
   onSave?: (newData: any) => void;
   children: React.ReactNode;
   defaultTitle?: string;
+  deriveOptions?: { label: string; to: string; stateKey: string }[];
 }
 
 export function EditableResult({
@@ -15,7 +17,9 @@ export function EditableResult({
   onSave,
   children,
   defaultTitle = "导出数据",
+  deriveOptions,
 }: EditableResultProps) {
+  const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState("");
   const [isSaving, setIsSaving] = useState(false);
@@ -160,6 +164,40 @@ export function EditableResult({
           <button onClick={handleExport} style={styles.exportBtn}>
             导出到本地
           </button>
+
+          {!isEditing &&
+            deriveOptions &&
+            deriveOptions.map((opt) => (
+              <button
+                key={opt.to}
+                onClick={() => {
+                  let passData = data;
+                  if (data && data.success !== undefined && data.response) {
+                    try {
+                      passData =
+                        typeof data.response === "string"
+                          ? JSON.parse(data.response)
+                          : data.response;
+                    } catch (e) {
+                      passData = data.response;
+                    }
+                  }
+                  if (Array.isArray(passData) && passData.length > 0) {
+                    passData = passData[0];
+                  }
+                  if (passData && passData.data) {
+                    passData = passData.data;
+                  }
+
+                  navigate(opt.to, {
+                    state: { [opt.stateKey]: JSON.stringify(passData) },
+                  });
+                }}
+                style={styles.deriveBtn}
+              >
+                🚀 {opt.label}
+              </button>
+            ))}
         </div>
       )}
 

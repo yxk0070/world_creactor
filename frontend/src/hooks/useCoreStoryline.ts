@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useTasks } from "../contexts/TaskContext";
 
 interface Worldview {
@@ -45,6 +45,7 @@ export function useCoreStoryline() {
   const [streamContent, setStreamContent] = useState("");
   const [showStream, setShowStream] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const { addTask, updateTask } = useTasks();
 
   const filteredCharacters = selectedWorldview
@@ -87,7 +88,17 @@ export function useCoreStoryline() {
   useEffect(() => {
     loadWorldviews();
     loadCharacters();
-  }, []);
+
+    // 监听派生跳转
+    if (location.state && location.state.worldviewContext) {
+      try {
+        const wvContext = JSON.parse(location.state.worldviewContext);
+        if (wvContext && wvContext.world_name) {
+          setWorldviewName(wvContext.world_name);
+        }
+      } catch (e) {}
+    }
+  }, [location.state]);
 
   useEffect(() => {
     if (selectedWorldview) {

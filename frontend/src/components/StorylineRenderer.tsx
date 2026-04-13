@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useTasks } from "../contexts/TaskContext";
 
 interface StorylineRendererProps {
@@ -238,252 +238,303 @@ export function StorylineRenderer({ data }: StorylineRendererProps) {
             const hasNext = !isLast;
 
             return (
-              <div
-                key={event.event_order || index}
-                style={{ position: "relative" }}
-              >
-                {hasNext && (
-                  <div
-                    style={{
-                      position: "absolute",
-                      left: "19px",
-                      top: "48px",
-                      bottom: "-24px",
-                      width: "2px",
-                      background:
-                        "linear-gradient(180deg, var(--accent-primary) 0%, var(--accent-bg-hover) 100%)",
-                    }}
-                  />
-                )}
-
-                <div
-                  style={{
-                    display: "flex",
-                    gap: "16px",
-                    marginBottom: "24px",
-                  }}
-                >
-                  <div
-                    style={{
-                      width: "40px",
-                      height: "40px",
-                      borderRadius: "50%",
-                      background:
-                        "linear-gradient(135deg, var(--accent-primary) 0%, #8b5cf6 100%)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      color: "white",
-                      fontWeight: "700",
-                      fontSize: "14px",
-                      flexShrink: 0,
-                      boxShadow: "0 4px 12px rgba(99, 102, 241, 0.4)",
-                      zIndex: 1,
-                    }}
-                  >
-                    {event.event_order || index + 1}
-                  </div>
-
-                  <div style={{ flex: 1, minWidth: 0 }}>
+              <React.Fragment key={event.event_order || index}>
+                <div style={{ position: "relative" }}>
+                  {hasNext && (
                     <div
                       style={{
-                        background: "var(--bg-card-80)",
-                        borderRadius: "12px",
-                        padding: "16px",
-                        border: "1px solid var(--border-dark)",
+                        position: "absolute",
+                        left: "19px",
+                        top: "48px",
+                        bottom: "-24px",
+                        width: "2px",
+                        background:
+                          "linear-gradient(180deg, var(--accent-primary) 0%, var(--accent-bg-hover) 100%)",
+                      }}
+                    />
+                  )}
+
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: "16px",
+                      marginBottom: "24px",
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: "40px",
+                        height: "40px",
+                        borderRadius: "50%",
+                        background:
+                          "linear-gradient(135deg, var(--accent-primary) 0%, #8b5cf6 100%)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: "white",
+                        fontWeight: "700",
+                        fontSize: "14px",
+                        flexShrink: 0,
+                        boxShadow: "0 4px 12px rgba(99, 102, 241, 0.4)",
+                        zIndex: 1,
+                      }}
+                    >
+                      {event.event_order || index + 1}
+                    </div>
+
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div
+                        style={{
+                          background: "var(--bg-card-80)",
+                          borderRadius: "12px",
+                          padding: "16px",
+                          border: "1px solid var(--border-dark)",
+                        }}
+                      >
+                        <div
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "flex-start",
+                            marginBottom: "8px",
+                          }}
+                        >
+                          <h3
+                            style={{
+                              fontSize: "16px",
+                              fontWeight: "600",
+                              color: "var(--text-secondary)",
+                              margin: 0,
+                            }}
+                          >
+                            {event.event_title ||
+                              `事件 ${event.event_order || index + 1}`}
+                          </h3>
+
+                          {(!event.sub_events ||
+                            event.sub_events.length === 0) && (
+                            <button
+                              onClick={() =>
+                                handleGenerateDetails(index, event)
+                              }
+                              disabled={loadingEventIndex !== null}
+                              style={{
+                                padding: "4px 8px",
+                                fontSize: "12px",
+                                cursor:
+                                  loadingEventIndex !== null
+                                    ? "not-allowed"
+                                    : "pointer",
+                                background: "var(--accent-bg)",
+                                color: "#a5b4fc",
+                                border: "1px solid var(--accent-bg-hover)",
+                                borderRadius: "4px",
+                                opacity:
+                                  loadingEventIndex !== null &&
+                                  loadingEventIndex !== index
+                                    ? 0.5
+                                    : 1,
+                              }}
+                            >
+                              {loadingEventIndex === index
+                                ? "生成中..."
+                                : "✨ 生成细节"}
+                            </button>
+                          )}
+                        </div>
+
+                        {event.description && (
+                          <p
+                            style={{
+                              color: "var(--text-tertiary)",
+                              fontSize: "14px",
+                              lineHeight: "1.7",
+                              marginBottom: "12px",
+                            }}
+                          >
+                            {event.description}
+                          </p>
+                        )}
+
+                        <div
+                          style={{
+                            display: "flex",
+                            flexWrap: "wrap",
+                            gap: "8px",
+                            marginBottom: "8px",
+                          }}
+                        >
+                          {event.location && (
+                            <span
+                              style={{
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "4px",
+                                background: "rgba(59, 130, 246, 0.2)",
+                                color: "#60a5fa",
+                                padding: "4px 10px",
+                                borderRadius: "6px",
+                                fontSize: "12px",
+                              }}
+                            >
+                              📍 {event.location}
+                            </span>
+                          )}
+                          {event.key_characters &&
+                            event.key_characters.map(
+                              (char: string, i: number) => (
+                                <span
+                                  key={i}
+                                  style={{
+                                    display: "inline-flex",
+                                    alignItems: "center",
+                                    gap: "4px",
+                                    background: "rgba(236, 72, 153, 0.2)",
+                                    color: "#f472b6",
+                                    padding: "4px 10px",
+                                    borderRadius: "6px",
+                                    fontSize: "12px",
+                                  }}
+                                >
+                                  👤 {char}
+                                </span>
+                              )
+                            )}
+                        </div>
+
+                        {event.significance && (
+                          <div
+                            style={{
+                              background: "rgba(139, 92, 246, 0.15)",
+                              borderRadius: "8px",
+                              padding: "8px 12px",
+                              borderLeft: "3px solid #a78bfa",
+                            }}
+                          >
+                            <span
+                              style={{
+                                color: "#c4b5fd",
+                                fontSize: "12px",
+                                fontStyle: "italic",
+                              }}
+                            >
+                              {event.significance}
+                            </span>
+                          </div>
+                        )}
+
+                        {/* 渲染子节点细节 */}
+                        {event.sub_events && event.sub_events.length > 0 && (
+                          <div
+                            style={{
+                              marginTop: "16px",
+                              paddingLeft: "16px",
+                              borderLeft: "2px solid var(--border-light)",
+                            }}
+                          >
+                            {event.sub_events.map(
+                              (sub: any, subIndex: number) => (
+                                <div
+                                  key={subIndex}
+                                  style={{ marginBottom: "12px" }}
+                                >
+                                  <div
+                                    style={{
+                                      display: "flex",
+                                      alignItems: "center",
+                                      gap: "8px",
+                                      marginBottom: "4px",
+                                    }}
+                                  >
+                                    <span
+                                      style={{
+                                        color: "#8b5cf6",
+                                        fontSize: "12px",
+                                        fontWeight: "bold",
+                                      }}
+                                    >
+                                      ◆
+                                    </span>
+                                    <span
+                                      style={{
+                                        color: "var(--text-secondary)",
+                                        fontSize: "14px",
+                                        fontWeight: "600",
+                                      }}
+                                    >
+                                      {sub.title}
+                                    </span>
+                                  </div>
+                                  <div
+                                    style={{
+                                      color: "var(--text-tertiary)",
+                                      fontSize: "13px",
+                                      lineHeight: "1.6",
+                                      paddingLeft: "16px",
+                                    }}
+                                  >
+                                    {sub.description}
+                                  </div>
+                                </div>
+                              )
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 渲染过渡篇章 */}
+                {event.transition_to_next &&
+                  index < localData.key_events.length - 1 && (
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        margin: "-12px 0 24px 0",
+                        position: "relative",
+                        zIndex: 2,
                       }}
                     >
                       <div
                         style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "flex-start",
-                          marginBottom: "8px",
+                          background: "var(--bg-card)",
+                          border: "1px dashed var(--accent-purple)",
+                          borderRadius: "16px",
+                          padding: "12px 24px",
+                          maxWidth: "80%",
+                          textAlign: "center",
+                          color: "var(--text-secondary)",
+                          fontSize: "14px",
+                          lineHeight: "1.6",
+                          fontStyle: "italic",
+                          boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                          position: "relative",
                         }}
                       >
-                        <h3
+                        <span
                           style={{
-                            fontSize: "16px",
-                            fontWeight: "600",
-                            color: "var(--text-secondary)",
-                            margin: 0,
+                            position: "absolute",
+                            top: "-10px",
+                            left: "50%",
+                            transform: "translateX(-50%)",
+                            background: "var(--bg-solid-card)",
+                            padding: "0 8px",
+                            color: "var(--accent-purple)",
+                            fontSize: "12px",
+                            fontWeight: "bold",
+                            borderRadius: "4px",
+                            border: "1px solid var(--accent-purple)",
                           }}
                         >
-                          {event.event_title ||
-                            `事件 ${event.event_order || index + 1}`}
-                        </h3>
-
-                        {(!event.sub_events ||
-                          event.sub_events.length === 0) && (
-                          <button
-                            onClick={() => handleGenerateDetails(index, event)}
-                            disabled={loadingEventIndex !== null}
-                            style={{
-                              padding: "4px 8px",
-                              fontSize: "12px",
-                              cursor:
-                                loadingEventIndex !== null
-                                  ? "not-allowed"
-                                  : "pointer",
-                              background: "var(--accent-bg)",
-                              color: "#a5b4fc",
-                              border: "1px solid var(--accent-bg-hover)",
-                              borderRadius: "4px",
-                              opacity:
-                                loadingEventIndex !== null &&
-                                loadingEventIndex !== index
-                                  ? 0.5
-                                  : 1,
-                            }}
-                          >
-                            {loadingEventIndex === index
-                              ? "生成中..."
-                              : "✨ 生成细节"}
-                          </button>
-                        )}
+                          过渡篇章
+                        </span>
+                        {event.transition_to_next}
                       </div>
-
-                      {event.description && (
-                        <p
-                          style={{
-                            color: "var(--text-tertiary)",
-                            fontSize: "14px",
-                            lineHeight: "1.7",
-                            marginBottom: "12px",
-                          }}
-                        >
-                          {event.description}
-                        </p>
-                      )}
-
-                      <div
-                        style={{
-                          display: "flex",
-                          flexWrap: "wrap",
-                          gap: "8px",
-                          marginBottom: "8px",
-                        }}
-                      >
-                        {event.location && (
-                          <span
-                            style={{
-                              display: "inline-flex",
-                              alignItems: "center",
-                              gap: "4px",
-                              background: "rgba(59, 130, 246, 0.2)",
-                              color: "#60a5fa",
-                              padding: "4px 10px",
-                              borderRadius: "6px",
-                              fontSize: "12px",
-                            }}
-                          >
-                            📍 {event.location}
-                          </span>
-                        )}
-                        {event.key_characters &&
-                          event.key_characters.map(
-                            (char: string, i: number) => (
-                              <span
-                                key={i}
-                                style={{
-                                  display: "inline-flex",
-                                  alignItems: "center",
-                                  gap: "4px",
-                                  background: "rgba(236, 72, 153, 0.2)",
-                                  color: "#f472b6",
-                                  padding: "4px 10px",
-                                  borderRadius: "6px",
-                                  fontSize: "12px",
-                                }}
-                              >
-                                👤 {char}
-                              </span>
-                            )
-                          )}
-                      </div>
-
-                      {event.significance && (
-                        <div
-                          style={{
-                            background: "rgba(139, 92, 246, 0.15)",
-                            borderRadius: "8px",
-                            padding: "8px 12px",
-                            borderLeft: "3px solid #a78bfa",
-                          }}
-                        >
-                          <span
-                            style={{
-                              color: "#c4b5fd",
-                              fontSize: "12px",
-                              fontStyle: "italic",
-                            }}
-                          >
-                            {event.significance}
-                          </span>
-                        </div>
-                      )}
-
-                      {/* 渲染子节点细节 */}
-                      {event.sub_events && event.sub_events.length > 0 && (
-                        <div
-                          style={{
-                            marginTop: "16px",
-                            paddingLeft: "16px",
-                            borderLeft: "2px solid var(--border-light)",
-                          }}
-                        >
-                          {event.sub_events.map(
-                            (sub: any, subIndex: number) => (
-                              <div
-                                key={subIndex}
-                                style={{ marginBottom: "12px" }}
-                              >
-                                <div
-                                  style={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    gap: "8px",
-                                    marginBottom: "4px",
-                                  }}
-                                >
-                                  <span
-                                    style={{
-                                      color: "#8b5cf6",
-                                      fontSize: "12px",
-                                      fontWeight: "bold",
-                                    }}
-                                  >
-                                    ◆
-                                  </span>
-                                  <span
-                                    style={{
-                                      color: "var(--text-secondary)",
-                                      fontSize: "14px",
-                                      fontWeight: "600",
-                                    }}
-                                  >
-                                    {sub.title}
-                                  </span>
-                                </div>
-                                <div
-                                  style={{
-                                    color: "var(--text-tertiary)",
-                                    fontSize: "13px",
-                                    lineHeight: "1.6",
-                                    paddingLeft: "16px",
-                                  }}
-                                >
-                                  {sub.description}
-                                </div>
-                              </div>
-                            )
-                          )}
-                        </div>
-                      )}
                     </div>
-                  </div>
-                </div>
-              </div>
+                  )}
+              </React.Fragment>
             );
           })}
         </div>

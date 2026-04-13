@@ -6,7 +6,7 @@ export function ArticleRenderer({ data }: { data: any }) {
   if (data?.data?.data?.content || data?.data?.data?.title) {
     articleData = data.data.data;
     console.log("ArticleRenderer -> 解析层级: data.data.data");
-  } else if (data?.data?.content || data?.data?.title) {
+  } else if (data?.data?.content || data?.data?.title || data?.data?.is_full_article) {
     articleData = data.data;
     console.log("ArticleRenderer -> 解析层级: data.data");
   } else {
@@ -14,6 +14,71 @@ export function ArticleRenderer({ data }: { data: any }) {
   }
 
   console.log("ArticleRenderer -> 最终用于渲染的 articleData:", articleData);
+
+  if (articleData.is_full_article && articleData.chapters) {
+    return (
+      <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+        <h2 style={{
+            color: "var(--text-primary)",
+            fontSize: "28px",
+            fontWeight: "800",
+            margin: "0 0 8px 0",
+            textAlign: "center",
+          }}>
+          {articleData.title}
+        </h2>
+        <p style={{ textAlign: "center", color: "var(--text-muted)", fontSize: "14px", margin: "0 0 24px 0" }}>
+          连载全文 • 共 {articleData.chapters.length} 章
+        </p>
+
+        {articleData.chapters.map((chapter: any, index: number) => (
+          <div key={index} style={{
+            background: "var(--bg-glass)",
+            borderRadius: "16px",
+            padding: "32px",
+            border: "1px solid var(--border-dark-80)",
+            boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
+            marginBottom: "24px"
+          }}>
+            <h3 style={{
+              color: "var(--accent-primary)",
+              fontSize: "20px",
+              fontWeight: "700",
+              margin: "0 0 20px 0",
+              paddingBottom: "12px",
+              borderBottom: "1px dashed var(--border-dark)"
+            }}>
+              {chapter.chapter_title}
+            </h3>
+            <div style={{
+              color: "var(--text-secondary)",
+              fontSize: "16px",
+              lineHeight: "1.9",
+              whiteSpace: "pre-wrap",
+              letterSpacing: "0.5px"
+            }}>
+              {chapter.content}
+            </div>
+            
+            {chapter.event_description && (
+              <div style={{
+                marginTop: "24px",
+                background: "var(--bg-card-60)",
+                borderRadius: "8px",
+                padding: "12px 16px",
+                borderLeft: "4px solid var(--border-dark)",
+                fontSize: "13px",
+                color: "var(--text-tertiary)"
+              }}>
+                <strong style={{ color: "var(--text-muted)" }}>节点参考：</strong>
+                {chapter.event_description}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>

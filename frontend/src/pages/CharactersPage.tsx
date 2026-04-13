@@ -143,6 +143,9 @@ export function CharactersPage() {
               cacheId={(result as any).cache_id}
               onSave={(newData) => setResult(newData)}
               defaultTitle="人物设定"
+              deriveOptions={[
+                { label: "基于此生成关系网", to: "/character-network", stateKey: "characterContext" }
+              ]}
             >
               <div style={styles.resultContent}>
                 {checkCharacter(result) ? (

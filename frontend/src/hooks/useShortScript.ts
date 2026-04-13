@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useLocation } from "react-router-dom";
 import { useTasks } from "../contexts/TaskContext";
 
 interface Storyline {
@@ -13,8 +14,9 @@ export function useShortScript() {
   const [style, setStyle] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
-  const [streamContent, setStreamContent] = useState<string>("");
+  const [streamContent, setStreamContent] = useState("");
   const [showStream, setShowStream] = useState(false);
+  const location = useLocation();
   const { addTask, updateTask } = useTasks();
 
   // 故事线选择相关状态
@@ -45,7 +47,21 @@ export function useShortScript() {
       }
     };
     fetchStorylines();
-  }, []);
+
+    if (location.state && location.state.articleContext) {
+      try {
+        const articleCtx = JSON.parse(location.state.articleContext);
+        if (articleCtx && (articleCtx.content || articleCtx.dialogue)) {
+          setEventDescription(articleCtx.content || articleCtx.dialogue || "");
+          setContext(
+            articleCtx.title ||
+              articleCtx.event_description ||
+              "从文章/文案派生"
+          );
+        }
+      } catch (e) {}
+    }
+  }, [location.state]);
 
   // 当选择的故事线改变时，提取其所有主事件和细节事件
   useEffect(() => {

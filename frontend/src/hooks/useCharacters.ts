@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useTasks } from "../contexts/TaskContext";
 
 interface Worldview {
@@ -28,11 +28,25 @@ export function useCharacters() {
   const [streamContent, setStreamContent] = useState("");
   const [showStream, setShowStream] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const { addTask, updateTask } = useTasks();
 
   useEffect(() => {
     loadWorldviews();
-  }, []);
+
+    // 如果从上一个页面传来了派生上下文，则自动填充
+    if (location.state && location.state.worldviewContext) {
+      try {
+        const wvContext = JSON.parse(location.state.worldviewContext);
+        if (wvContext && wvContext.world_name) {
+          setWorldviewName(wvContext.world_name);
+          setBackground(
+            `【这是基于以下世界观派生的人物】\n世界名：${wvContext.world_name}\n核心设定：${wvContext.core_setting || ""}`
+          );
+        }
+      } catch (e) {}
+    }
+  }, [location.state]);
 
   const loadWorldviews = async () => {
     try {
@@ -154,22 +168,22 @@ export function useCharacters() {
       console.log("API返回的完整数据:", data);
       if (data.success) {
         setStreamContent("生成完成！");
-        
+
         let finalResult = data;
         try {
           if (data.response) {
             const parsedData = JSON.parse(data.response);
             if (Array.isArray(parsedData) && parsedData.length > 0) {
               finalResult = parsedData[0];
-            } else if (parsedData && typeof parsedData === 'object') {
+            } else if (parsedData && typeof parsedData === "object") {
               finalResult = parsedData;
             }
           }
-          
+
           if (data.cache_id) {
-             finalResult.cache_id = data.cache_id;
+            finalResult.cache_id = data.cache_id;
           } else if (data.cache_ids && data.cache_ids.length > 0) {
-             finalResult.cache_id = data.cache_ids[0];
+            finalResult.cache_id = data.cache_ids[0];
           }
         } catch (e) {
           console.warn("Character parse response fallback:", e);
