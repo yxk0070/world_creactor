@@ -82,7 +82,19 @@ export function useWorldview() {
         let finalResult = data;
         try {
           if (data.response) {
-            const parsedData = JSON.parse(data.response);
+            let parsedData;
+            if (typeof data.response === "string") {
+              let cleanStr = data.response.trim();
+              if (cleanStr.startsWith("```json")) cleanStr = cleanStr.substring(7);
+              else if (cleanStr.startsWith("```")) cleanStr = cleanStr.substring(3);
+              if (cleanStr.endsWith("```")) cleanStr = cleanStr.substring(0, cleanStr.length - 3);
+              cleanStr = cleanStr.trim();
+              if (cleanStr.startsWith("{") && !cleanStr.endsWith("}")) cleanStr += "}";
+              parsedData = JSON.parse(cleanStr);
+            } else {
+              parsedData = data.response;
+            }
+            
             if (Array.isArray(parsedData) && parsedData.length > 0) {
               finalResult = parsedData[0];
             } else if (parsedData && typeof parsedData === "object") {

@@ -14,7 +14,16 @@ export function WorldviewRenderer({ data }: WorldviewRendererProps) {
 
   if (worldviewData.success && worldviewData.response) {
     try {
-      const parsedResponse = JSON.parse(worldviewData.response);
+      let cleanStr = worldviewData.response;
+      if (typeof cleanStr === "string") {
+        cleanStr = cleanStr.trim();
+        if (cleanStr.startsWith("```json")) cleanStr = cleanStr.substring(7);
+        else if (cleanStr.startsWith("```")) cleanStr = cleanStr.substring(3);
+        if (cleanStr.endsWith("```")) cleanStr = cleanStr.substring(0, cleanStr.length - 3);
+        cleanStr = cleanStr.trim();
+        if (cleanStr.startsWith("{") && !cleanStr.endsWith("}")) cleanStr += "}";
+      }
+      const parsedResponse = typeof cleanStr === "string" ? JSON.parse(cleanStr) : cleanStr;
       console.log("解析后的response:", parsedResponse);
       worldviewData = parsedResponse;
     } catch (e) {
@@ -22,15 +31,15 @@ export function WorldviewRenderer({ data }: WorldviewRendererProps) {
       worldviewData = worldviewData.response;
     }
   }
-  
-  if (Array.isArray(worldviewData) && worldviewData.length > 0) {
-    worldviewData = worldviewData[0];
-  }
 
-  if (worldviewData.data) {
-    worldviewData = worldviewData.data;
-    if (worldviewData.data) {
+  // 递归解包数据
+  while (true) {
+    if (Array.isArray(worldviewData) && worldviewData.length > 0) {
+      worldviewData = worldviewData[0];
+    } else if (worldviewData && worldviewData.data) {
       worldviewData = worldviewData.data;
+    } else {
+      break;
     }
   }
 

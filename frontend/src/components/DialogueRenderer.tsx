@@ -6,11 +6,28 @@ interface DialogueRendererProps {
 
 export function DialogueRenderer({ data }: DialogueRendererProps) {
   let dialogueData = data;
-  if (data?.data && (data.data.dialogue || data.data.content)) {
-    dialogueData = data.data;
+  
+  if (dialogueData?.success && dialogueData?.response) {
+    try {
+      const parsedResponse = JSON.parse(dialogueData.response);
+      dialogueData = parsedResponse;
+    } catch (e) {
+      dialogueData = dialogueData.response;
+    }
+  }
+
+  // 递归解包数据
+  while (true) {
+    if (Array.isArray(dialogueData) && dialogueData.length > 0) {
+      dialogueData = dialogueData[0];
+    } else if (dialogueData && dialogueData.data) {
+      dialogueData = dialogueData.data;
+    } else {
+      break;
+    }
   }
   
-  const content = dialogueData.content || dialogueData.dialogue || (typeof dialogueData === "string" ? dialogueData : JSON.stringify(dialogueData, null, 2));
+  const content = dialogueData?.content || dialogueData?.dialogue || (typeof dialogueData === "string" ? dialogueData : JSON.stringify(dialogueData, null, 2));
 
   // 简单的文案解析器
   const parseDialogue = (text: string) => {

@@ -172,7 +172,22 @@ export function useCharacters() {
         let finalResult = data;
         try {
           if (data.response) {
-            const parsedData = JSON.parse(data.response);
+            let parsedData;
+            // 尝试安全解析 response
+            if (typeof data.response === "string") {
+              // 修复大模型偶尔截断或带有多余 markdown 的情况
+              let cleanStr = data.response.trim();
+              if (cleanStr.startsWith("```json")) cleanStr = cleanStr.substring(7);
+              else if (cleanStr.startsWith("```")) cleanStr = cleanStr.substring(3);
+              if (cleanStr.endsWith("```")) cleanStr = cleanStr.substring(0, cleanStr.length - 3);
+              cleanStr = cleanStr.trim();
+              if (cleanStr.startsWith("{") && !cleanStr.endsWith("}")) cleanStr += "}";
+              
+              parsedData = JSON.parse(cleanStr);
+            } else {
+              parsedData = data.response;
+            }
+            
             if (Array.isArray(parsedData) && parsedData.length > 0) {
               finalResult = parsedData[0];
             } else if (parsedData && typeof parsedData === "object") {

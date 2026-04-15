@@ -111,6 +111,17 @@ export function useChat() {
                   return newPlan;
                 });
                 setWorkflowStatus(data.message);
+              } else if (data.type === "chunk") {
+                setChatHistory((prev: Message[]) => {
+                  const newMsgs = [...prev];
+                  const lastMsg = newMsgs[newMsgs.length - 1];
+                  if (lastMsg && lastMsg.role === "assistant") {
+                    lastMsg.content += data.content;
+                  } else {
+                    newMsgs.push({ role: "assistant", content: data.content });
+                  }
+                  return newMsgs;
+                });
               } else if (data.type === "step_end") {
                 setWorkflowPlan((prev) => {
                   const newPlan = [...prev];
@@ -149,7 +160,16 @@ export function useChat() {
                     content: contentStr,
                     data: parsedData,
                   };
-                  setChatHistory((prev) => [...prev, assistantMessage]);
+                  setChatHistory((prev) => {
+                    const newMsgs = [...prev];
+                    const lastMsg = newMsgs[newMsgs.length - 1];
+                    if (lastMsg && lastMsg.role === "assistant") {
+                      // 替换之前的 chunk 累积内容为最终整理的内容
+                      newMsgs[newMsgs.length - 1] = assistantMessage;
+                      return newMsgs;
+                    }
+                    return [...prev, assistantMessage];
+                  });
                   setWorkflowPlan([]);
                   setWorkflowStatus("");
                 } else {

@@ -6,11 +6,28 @@ interface ShortScriptRendererProps {
 
 export function ShortScriptRenderer({ data }: ShortScriptRendererProps) {
   let scriptData = data;
-  if (data?.data && (data.data.script || data.data.content)) {
-    scriptData = data.data;
+  
+  if (scriptData?.success && scriptData?.response) {
+    try {
+      const parsedResponse = JSON.parse(scriptData.response);
+      scriptData = parsedResponse;
+    } catch (e) {
+      scriptData = scriptData.response;
+    }
+  }
+
+  // 递归解包数据
+  while (true) {
+    if (Array.isArray(scriptData) && scriptData.length > 0) {
+      scriptData = scriptData[0];
+    } else if (scriptData && scriptData.data) {
+      scriptData = scriptData.data;
+    } else {
+      break;
+    }
   }
   
-  const content = scriptData.content || scriptData.script || (typeof scriptData === "string" ? scriptData : JSON.stringify(scriptData, null, 2));
+  const content = scriptData?.content || scriptData?.script || (typeof scriptData === "string" ? scriptData : JSON.stringify(scriptData, null, 2));
 
   // 简单的分镜脚本解析器
   const parseScript = (text: string) => {

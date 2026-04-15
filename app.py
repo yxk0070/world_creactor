@@ -13,8 +13,27 @@ from langchain.agents import AgentExecutor, create_openai_tools_agent, create_op
 from langchain.tools import tool
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
-from input_analyzer import analyzer
-from cache_manager import cache_manager
+from services.input_analyzer import analyzer
+import queue
+import threading
+from langchain.callbacks.base import BaseCallbackHandler
+
+class QueueCallbackHandler(BaseCallbackHandler):
+    def __init__(self, q):
+        self.q = q
+
+    def on_llm_new_token(self, token: str, **kwargs):
+        self.q.put(token)
+
+    def on_llm_end(self, *args, **kwargs):
+        self.q.put(None)
+
+    def on_llm_error(self, *args, **kwargs):
+        self.q.put(None)
+
+from cache.cache_manager import cache_manager
+from routes.api import api_bp
+from core.middleware import require_auth, rate_limit
 
 
 load_dotenv()
@@ -23,6 +42,7 @@ print("[DEBUG] Flask app 正在初始化...")
 app = Flask(__name__, 
             static_folder='frontend/dist', 
             static_url_path='')
+app.register_blueprint(api_bp)
 
 
 @app.route('/')
@@ -45,6 +65,9 @@ def index(path=None):
     return send_file(frontend_path)
 
 
+from schemas.llm_schemas import TimelineData
+from langchain.output_parsers import PydanticOutputParser
+
 @tool
 def extract_timeline(article: str) -> str:
     """
@@ -63,30 +86,19 @@ def extract_timeline(article: str) -> str:
         model=os.getenv("ARK_MODEL", "ep-20260304154408-lf678"),
         api_key=os.getenv("ARK_API_KEY"),
         base_url=os.getenv("ARK_BASE_URL", "https://ark.cn-beijing.volces.com/api/v3"),
-        temperature=0.7
+        temperature=0.7,
+        request_timeout=120,
+        timeout=120,
+        max_retries=3
     )
     
-    prompt = f"""请从以下文章中提取关键事件，以时间线的形式整理出来。请严格返回以下JSON格式（不要包含任何Markdown代码块如```json，直接返回纯JSON文本）：
+    parser = PydanticOutputParser(pydantic_object=TimelineData)
+    
+    prompt = f"""请从以下文章中提取关键事件，以时间线的形式整理出来。
+    
+{parser.get_format_instructions()}
 
-{{
-  "tool": "extract_timeline",
-  "status": "completed",
-  "data": {{
-    "events": [
-      {{
-        "number": 1,
-        "title": "事件标题",
-        "time": "时间",
-        "location": "地点",
-        "description": "事件描述",
-        "characters": ["关键人物1", "关键人物2"],
-        "importance": "高/中/低"
-      }}
-    ]
-  }}
-}}
-
-请确保每个事件都有编号、标题、时间、地点、描述、关键人物和重要性。请按照时间顺序排列事件。
+请确保每个事件都有编号、标题、时间、地点、描述、关键人物和重要性。请按照时间顺序排列事件。不要带有Markdown代码块。
 
 文章内容：
 {article}"""
@@ -105,10 +117,15 @@ def extract_timeline(article: str) -> str:
     result_text = result_text.strip()
     
     try:
-        json.loads(result_text)
-        return result_text
+        parsed_data = parser.parse(result_text)
+        return json.dumps({
+            "tool": "extract_timeline",
+            "status": "completed",
+            "data": parsed_data.dict()
+        }, ensure_ascii=False)
     except Exception as e:
-        print(f"[DEBUG] extract_timeline JSON 解析失败: {e}, 原始内容: {result_text[:100]}...")
+        print(f"[DEBUG] extract_timeline Pydantic 解析失败: {e}, 原始内容: {result_text[:100]}...")
+        # fallback
         return json.dumps({
             "tool": "extract_timeline",
             "status": "completed",
@@ -146,7 +163,10 @@ def analyze_worldview(article: str) -> str:
         model=os.getenv("ARK_MODEL", "ep-20260304154408-lf678"),
         api_key=os.getenv("ARK_API_KEY"),
         base_url=os.getenv("ARK_BASE_URL", "https://ark.cn-beijing.volces.com/api/v3"),
-        temperature=0.7
+        temperature=0.7,
+        request_timeout=120,
+        timeout=120,
+        max_retries=3
     )
     
     prompt = f"""请从以下文章中分析和提取世界观设定。请严格返回以下JSON格式（不要包含任何Markdown代码块如```json，直接返回纯JSON文本）：
@@ -551,11 +571,11 @@ JSON 格式示例：
     chain = prompt | llm
     return chain
 
-def get_agent_executor(scenario: str = "小说"):
+def get_agent_executor(scenario: str = "小说", streaming: bool = False):
     """
     获取 agent 执行器
     """
-    print("[DEBUG] 初始化 Agent...")
+    print(f"[DEBUG] 初始化 Agent (streaming={streaming})...")
     api_key = os.getenv("ARK_API_KEY")
     base_url = os.getenv("ARK_BASE_URL", "https://ark.cn-beijing.volces.com/api/v3")
     model = os.getenv("ARK_MODEL", "ep-20260304154408-lf678")
@@ -567,6 +587,10 @@ def get_agent_executor(scenario: str = "小说"):
     llm = ChatOpenAI(
         model=model,
         temperature=0.7,
+        streaming=streaming,
+        request_timeout=300,
+        timeout=300,
+        max_retries=3,
         max_tokens=8192,
         openai_api_key=api_key,
         openai_api_base=base_url
@@ -624,6 +648,7 @@ def get_agent_executor(scenario: str = "小说"):
 【人物生成 JSON 格式】
 如果使用 generate_character，请返回以下 JSON 格式。
 注意：人物姓名必须根据世界观和背景设定进行原创设计，禁止使用千篇一律的默认名字（如“林默”、“李逍遥”、“张三”等），请发挥创造力！
+请严格返回纯 JSON 格式（不要包含任何 Markdown 代码块，不要回复任何解释性文字，只输出以左花括号开始、右花括号结束的 JSON 字符串）：
 {{{{
   "tool": "generate_character",
   "status": "completed",
@@ -985,6 +1010,7 @@ def analyze():
 
 
 @app.route('/api/chat/workflow', methods=['POST'])
+@rate_limit
 def chat_workflow():
     print("[DEBUG] 收到 /api/chat/workflow 请求")
     try:
@@ -1064,7 +1090,7 @@ def chat_workflow():
                     threading.Thread(target=run_research, daemon=True).start()
                     
                     plan = []
-                    agent_executor = get_agent_executor(scenario)
+                    agent_executor = get_agent_executor(scenario, streaming=True)
                     results = []
                     cache_ids = []
                     
@@ -1094,8 +1120,39 @@ def chat_workflow():
                                 step_input += f"请使用以下参数：\n{json.dumps(params, ensure_ascii=False)}"
                                 
                             try:
-                                step_result = agent_executor.invoke({"input": step_input})
-                                step_output = step_result['output']
+                                step_agent = get_agent_executor(scenario, streaming=True)
+                                step_q = queue.Queue()
+                                step_callback = QueueCallbackHandler(step_q)
+                                step_agent.agent.runnable = step_agent.agent.runnable.with_config(callbacks=[step_callback])
+                                
+                                step_result_container = {}
+                                step_error_container = {}
+                                
+                                def run_step():
+                                    try:
+                                        res = step_agent.invoke({"input": step_input})
+                                        step_result_container['result'] = res
+                                    except Exception as e:
+                                        step_error_container['error'] = e
+                                    finally:
+                                        step_q.put(None)
+                                
+                                t_step = threading.Thread(target=run_step)
+                                t_step.start()
+                                
+                                while True:
+                                    token = step_q.get()
+                                    if token is None:
+                                        break
+                                    # 给前端推送保活包，防止网关 Nginx 504 Gateway Timeout
+                                    yield f"data: {json.dumps({'type': 'chunk', 'content': token}, ensure_ascii=False)}\n\n"
+                                
+                                t_step.join()
+                                
+                                if 'error' in step_error_container:
+                                    raise step_error_container['error']
+                                    
+                                step_output = step_result_container['result']['output']
                                 
                                 cleaned_out = step_output.strip()
                                 if cleaned_out.startswith("```json"): cleaned_out = cleaned_out[7:]
@@ -1159,9 +1216,43 @@ def chat_workflow():
                     
             # Fallback for analysis or single agent
             yield f"data: {json.dumps({'type': 'status', 'message': '正在处理...'}, ensure_ascii=False)}\n\n"
-            agent_executor = get_agent_executor(scenario)
+            agent_executor = get_agent_executor(scenario, streaming=True)
             try:
-                result = agent_executor.invoke({"input": user_input})
+                q = queue.Queue()
+                callback = QueueCallbackHandler(q)
+                
+                # 注入 callbacks
+                agent_executor.agent.runnable = agent_executor.agent.runnable.with_config(callbacks=[callback])
+                
+                result_container = {}
+                error_container = {}
+                
+                def run_fallback():
+                    try:
+                        res = agent_executor.invoke({"input": user_input})
+                        result_container['result'] = res
+                    except Exception as e:
+                        error_container['error'] = e
+                    finally:
+                        q.put(None)
+                
+                t = threading.Thread(target=run_fallback)
+                t.start()
+                
+                accumulated = ""
+                while True:
+                    token = q.get()
+                    if token is None:
+                        break
+                    accumulated += token
+                    yield f"data: {json.dumps({'type': 'chunk', 'content': token}, ensure_ascii=False)}\n\n"
+                
+                t.join()
+                
+                if 'error' in error_container:
+                    raise error_container['error']
+                    
+                result = result_container['result']
                 output = result['output']
                 
                 cleaned_output = output.strip()
@@ -1212,6 +1303,7 @@ def chat_workflow():
 
 
 @app.route('/api/chat', methods=['POST'])
+@rate_limit
 def chat():
     print("[DEBUG] 收到 /api/chat 请求")
     try:
@@ -1521,6 +1613,7 @@ def chat():
         print("[DEBUG] Agent 已初始化，开始调用...")
         
         try:
+            # TODO: 改为同步调用的 stream 或者是直接获取结果，因为这部分没有采用队列推流，会阻塞直到结束
             result = agent_executor.invoke({"input": user_input})
             output = result['output']
             print(f"[DEBUG] Agent 返回结果长度: {len(output)}")
@@ -1530,6 +1623,13 @@ def chat():
             
         # 尝试清理输出中的 markdown 代码块标记，防止 JSON 解析错误
         cleaned_output = output.strip()
+        
+        # 提取第一个 { 和最后一个 } 之间的内容，这是最稳妥的过滤多余对话的方法
+        import re
+        match = re.search(r'(\{.*\})', cleaned_output, re.DOTALL)
+        if match:
+            cleaned_output = match.group(1)
+            
         if cleaned_output.startswith("```json"):
             cleaned_output = cleaned_output[7:]
         elif cleaned_output.startswith("```"):
@@ -1544,11 +1644,13 @@ def chat():
             # 这是一个非常简单的修复，可能不适用于复杂的截断
             cleaned_output += "}"
             
+        # 始终把清理过的输出返回给前端，防止前端 JSON.parse 崩溃
+        output = cleaned_output
+        
         cache_id = None
         if auto_save:
             try:
                 result_json = json.loads(cleaned_output)
-                output = cleaned_output # 如果解析成功，使用清理后的输出
                 
                 if isinstance(result_json, list):
                     print(f"[DEBUG] 检测到 {len(result_json)} 个结果，逐个保存...")
@@ -1913,159 +2015,20 @@ def chat_stream():
         }), 500
 
 
-@app.route('/api/cache/all', methods=['GET'])
-def get_all_cache():
-    """获取所有缓存"""
-    try:
-        cache_data = cache_manager.get_all()
-        stats = cache_manager.get_stats()
-        return jsonify({
-            'success': True,
-            'data': cache_data,
-            'stats': stats
-        })
-    except Exception as e:
-        print(f"[DEBUG] 获取缓存错误: {e}")
-        return jsonify({'success': False, 'error': str(e)}), 500
 
 
-@app.route('/api/cache/get', methods=['POST'])
-def get_cache():
-    """获取单个缓存项"""
-    try:
-        data = request.json
-        item_id = data.get('id')
-        
-        if not item_id:
-            return jsonify({'error': '请提供缓存ID'}), 400
-        
-        item = cache_manager.get(item_id)
-        if item:
-            return jsonify({'success': True, 'data': item})
-        else:
-            return jsonify({'error': '未找到缓存项'}), 404
-    except Exception as e:
-        print(f"[DEBUG] 获取缓存错误: {e}")
-        return jsonify({'success': False, 'error': str(e)}), 500
 
 
-@app.route('/api/cache/save', methods=['POST'])
-def save_cache():
-    """手动保存一条缓存数据"""
-    try:
-        req_data = request.json
-        tool_name = req_data.get('type')
-        data_to_save = req_data.get('data')
-        name = req_data.get('name')
-        worldview_id = req_data.get('worldview_id')
-        
-        if not tool_name or not data_to_save:
-            return jsonify({'error': '请提供 type(tool_name) 和 data'}), 400
-            
-        # 兼容外层没有包 tool 的情况
-        if isinstance(data_to_save, dict) and 'tool' not in data_to_save:
-            data_to_save['tool'] = tool_name
-            
-        cache_id = cache_manager.save(tool_name, data_to_save, name=name, worldview_id=worldview_id)
-        return jsonify({'success': True, 'id': cache_id})
-    except Exception as e:
-        print(f"[DEBUG] 手动保存缓存错误: {e}")
-        import traceback
-        traceback.print_exc()
-        return jsonify({'success': False, 'error': str(e)}), 500
 
 
-@app.route('/api/cache/category', methods=['POST'])
-def get_cache_by_category():
-    """按分类获取缓存"""
-    try:
-        data = request.json
-        category = data.get('category')
-        
-        if not category:
-            return jsonify({'error': '请提供分类'}), 400
-        
-        items = cache_manager.get_by_category(category)
-        return jsonify({'success': True, 'data': items})
-    except Exception as e:
-        print(f"[DEBUG] 获取缓存错误: {e}")
-        return jsonify({'success': False, 'error': str(e)}), 500
 
 
-@app.route('/api/cache/search', methods=['POST'])
-def search_cache():
-    """搜索缓存"""
-    try:
-        data = request.json
-        keyword = data.get('keyword', '')
-        
-        items = cache_manager.search(keyword)
-        return jsonify({'success': True, 'data': items})
-    except Exception as e:
-        print(f"[DEBUG] 搜索缓存错误: {e}")
-        return jsonify({'success': False, 'error': str(e)}), 500
 
 
-@app.route('/api/cache/update', methods=['POST'])
-def update_cache():
-    """更新缓存项"""
-    try:
-        data = request.json
-        item_id = data.get('id')
-        new_data = data.get('data')
-        name = data.get('name')
-        
-        if not item_id or not new_data:
-            return jsonify({'error': '请提供缓存ID和新数据'}), 400
-        
-        success = cache_manager.update(item_id, new_data, name)
-        if success:
-            return jsonify({'success': True, 'message': '更新成功'})
-        else:
-            return jsonify({'error': '未找到缓存项'}), 404
-    except Exception as e:
-        print(f"[DEBUG] 更新缓存错误: {e}")
-        return jsonify({'success': False, 'error': str(e)}), 500
 
 
-@app.route('/api/cache/delete', methods=['POST'])
-def delete_cache():
-    """删除缓存项"""
-    try:
-        data = request.json
-        item_id = data.get('id')
-        
-        if not item_id:
-            return jsonify({'error': '请提供缓存ID'}), 400
-        
-        success = cache_manager.delete(item_id)
-        if success:
-            return jsonify({'success': True, 'message': '删除成功'})
-        else:
-            return jsonify({'error': '未找到缓存项'}), 404
-    except Exception as e:
-        print(f"[DEBUG] 删除缓存错误: {e}")
-        return jsonify({'success': False, 'error': str(e)}), 500
 
 
-@app.route('/api/cache/clear', methods=['POST'])
-def clear_cache():
-    """清空缓存"""
-    try:
-        data = request.json
-        category = data.get('category')
-        
-        if category:
-            cache_manager.clear_category(category)
-            message = f'已清空 {category} 分类'
-        else:
-            cache_manager.clear_all()
-            message = '已清空所有缓存'
-        
-        return jsonify({'success': True, 'message': message})
-    except Exception as e:
-        print(f"[DEBUG] 清空缓存错误: {e}")
-        return jsonify({'success': False, 'error': str(e)}), 500
 
 
 @app.route('/api/generate-world', methods=['POST'])

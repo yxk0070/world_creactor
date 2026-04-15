@@ -222,6 +222,8 @@ export function useArticle() {
         let finalData = null;
         let buffer = "";
 
+        let currentChapterContent = "";
+
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
@@ -234,6 +236,22 @@ export function useArticle() {
                 const data = JSON.parse(line.slice(6));
                 if (data.type === "end") {
                   finalData = data.content;
+                } else if (data.type === "chunk") {
+                  currentChapterContent += data.content;
+                  // 实时预览当前正在生成的章节
+                  setResult({
+                    tool: "generate_article_from_event",
+                    is_full_article: true,
+                    title: title,
+                    chapters: [
+                      ...combinedResults,
+                      {
+                        chapter_title: chapterTitle,
+                        content: currentChapterContent,
+                        event_description: eventDesc
+                      }
+                    ]
+                  });
                 } else if (data.type === "error") {
                   console.error(data.message);
                 }

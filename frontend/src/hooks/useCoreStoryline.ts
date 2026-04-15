@@ -351,11 +351,27 @@ export function useCoreStoryline() {
       if (finalData && finalData.success) {
         setStreamContent("生成完成！");
         try {
-          const parsedData = JSON.parse(finalData.response);
+          let cleanStr = finalData.response;
+          if (typeof cleanStr === "string") {
+            cleanStr = cleanStr.trim();
+            if (cleanStr.startsWith("```json")) cleanStr = cleanStr.substring(7);
+            else if (cleanStr.startsWith("```")) cleanStr = cleanStr.substring(3);
+            if (cleanStr.endsWith("```")) cleanStr = cleanStr.substring(0, cleanStr.length - 3);
+            cleanStr = cleanStr.trim();
+            if (cleanStr.startsWith("{") && !cleanStr.endsWith("}")) cleanStr += "}";
+          }
+          
+          const parsedData = typeof cleanStr === "string" ? JSON.parse(cleanStr) : cleanStr;
           // results 是个数组，取第一项，也就是 generate_story 的结果
           let finalResult = Array.isArray(parsedData)
             ? parsedData[0]
             : parsedData;
+            
+          // 如果解包后还有 data 壳，再解一层
+          if (finalResult.data && !finalResult.key_events && !finalResult.title) {
+            finalResult = finalResult.data;
+          }
+          
           if (finalData.cache_id) {
             finalResult.cache_id = finalData.cache_id;
           } else if (finalData.cache_ids && finalData.cache_ids.length > 0) {
